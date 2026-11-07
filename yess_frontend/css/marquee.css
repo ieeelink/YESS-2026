@@ -1,0 +1,67 @@
+/* The set is cloned in JS until the loop has no gaps at any screen width.
+   Only the container fades at its far edges; logos at rest are shown unaltered. */
+.marquee {
+  --logo-h: clamp(34px, 3.4vw, 50px);
+  position: relative;
+  z-index: 1;
+  background: var(--forest);
+  margin-top: clamp(40px, 7vh, 88px);
+  padding-block: clamp(26px, 4vh, 44px);
+  border-block: 1px solid rgb(255 255 255 / 0.14);
+  overflow: hidden;
+  mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent);
+}
+
+.marquee__track {
+  display: flex;
+  width: max-content;
+  animation: marquee var(--marquee-duration, 40s) linear infinite;
+}
+.marquee:hover .marquee__track,
+.marquee:focus-within .marquee__track {
+  animation-play-state: paused;
+}
+
+@keyframes marquee {
+  to { transform: translate3d(calc(-1 * var(--marquee-shift, 50%)), 0, 0); }
+}
+
+.marquee__set {
+  display: flex;
+  flex: none;
+  align-items: center;
+}
+
+.marquee__set li {
+  position: relative;
+  flex: none;
+  padding-inline: clamp(40px, 5.4vw, 92px);
+}
+
+/* A rivet between logos, well outside each logo's clear space. */
+.marquee__set li::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: -2px;
+  width: 5px;
+  height: 5px;
+  margin-top: -2px;
+  border-radius: 50%;
+  background: var(--signal);
+  opacity: 0.7;
+}
+
+.marquee a { display: block; }
+
+.marquee img {
+  width: auto;
+  height: var(--logo-h);
+  max-width: none;
+}
+/* Kerala Section's file is only 53px tall: never rendered above its native size. */
+.marquee img[width="216"] { height: min(var(--logo-h), 53px); }
+
+.reduced .marquee { mask-image: none; }
+.reduced .marquee__track { animation: none; width: auto; }
+.reduced .marquee__set { flex-wrap: wrap; justify-content: center; row-gap: 24px; width: 100%; }

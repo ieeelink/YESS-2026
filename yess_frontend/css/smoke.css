@@ -1,0 +1,67 @@
+.smoke,
+.smoke-fallback {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100lvh;
+}
+
+.smoke {
+  display: block;
+  z-index: 0;
+}
+
+/* Static smoke for reduced motion, for devices without WebGL2, and for no-JS. */
+.smoke-fallback {
+  z-index: 0;
+  display: none;
+  background:
+    radial-gradient(ellipse 34% 30% at 50% 48%, var(--ground) 0 40%, transparent 100%),
+    radial-gradient(ellipse 90% 55% at 50% 108%, color-mix(in srgb, var(--forest) 80%, var(--signal)) 0, transparent 70%),
+    var(--black);
+}
+
+.smoke-fallback::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: url("../img/smoke-fallback-wide.webp") center / cover no-repeat;
+}
+
+.smoke-fallback::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.06;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+@media (max-aspect-ratio: 1/1) {
+  .smoke-fallback::before {
+    background-image: url("../img/smoke-fallback-tall.webp");
+  }
+}
+
+.no-js .smoke,
+.smoke-off .smoke {
+  display: none;
+}
+
+.no-js .smoke-fallback,
+.smoke-off .smoke-fallback {
+  display: block;
+}
+
+/* The curtain only exists during the preloader. With WebGL it is removed at once, since the
+   shader draws its own black; without WebGL it opens as a CSS iris. */
+.curtain {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  display: none;
+  background: var(--black);
+  --iris: 0px;
+  mask-image: radial-gradient(circle at 50% 50%, transparent var(--iris), #000 calc(var(--iris) + 60px));
+}
+
+.is-loading .curtain { display: block; }

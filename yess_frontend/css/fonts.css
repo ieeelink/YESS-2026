@@ -1,0 +1,25 @@
+/*
+  FONT SWAP POINT. The whole site reads these two families through --font-display and --font-body.
+
+  TEMPORARY stand-ins until the design team's files land in assets/fonts/:
+    display -> Thomson (all-caps, big titles only). Stand-in: Big Shoulders Display (OFL).
+    body    -> Glasser (secondary, body, UI).        Stand-in: Hanken Grotesk (OFL).
+
+  To swap: change the src lines below, the two <link rel="preload"> lines in index.html,
+  and, if the new face runs wider or narrower, --display-scale in tokens.css.
+*/
+@font-face {
+  font-family: "YESS Display";
+  src: url("../fonts/standin/big-shoulders-display-latin-wght-normal.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "YESS Body";
+  src: url("../fonts/standin/hanken-grotesk-latin-wght-normal.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
