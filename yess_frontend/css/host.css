@@ -1,0 +1,138 @@
+/* --- Host: the arch from When becomes a gate that parts onto the campus --- */
+/* The photo's source is 1024x768. The cap keeps it at or below native size until a larger file arrives. */
+.host {
+  --frame-height: min(86svh, 740px, 46vw);
+  position: relative;
+  z-index: 1;
+  height: 280svh;
+  margin-top: -100svh;
+}
+
+/* Anchors land here, where the gate has finished opening. */
+.host__anchor {
+  position: absolute;
+  top: 60svh;
+}
+
+.host__stage {
+  position: sticky;
+  top: 0;
+  display: flex;
+  height: 100svh;
+  overflow: clip;
+}
+
+.host__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  column-gap: clamp(24px, 2.6vw, 56px);
+  align-items: end;
+}
+
+.host__head {
+  align-self: center;
+  display: grid;
+  gap: clamp(16px, 2.4vh, 28px);
+}
+
+.host__title {
+  max-width: 2.6em;  /* breaks into three lines beside the arch */
+  font-size: calc(clamp(72px, min(10.5vw, 22svh), 220px) * var(--display-scale));
+}
+
+/* The photo and rim fade out together at the foot, so the arch stands in the live smoke. */
+.host__frame {
+  position: relative;
+  width: calc(var(--frame-height) * 552 / 698);
+  height: var(--frame-height);
+  mask-image: linear-gradient(#000 70%, transparent 99%);
+}
+
+/* The gate sits inside the frame's room for the rim: 16 and 18 units of the 552 x 698 viewBox. */
+.host__gate {
+  position: absolute;
+  inset: 2.58% 2.9% 0;
+  overflow: hidden;
+  background: var(--forest-deep);
+  clip-path: url(#host-arch);
+}
+
+.host__view {
+  position: absolute;
+  inset: 0;
+  clip-path: inset(0 0% 0 0%);
+}
+
+.host__view img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 48% 50%;
+}
+
+.host__seam {
+  position: absolute;
+  inset: 0 auto 0 calc(50% - 0.5px);
+  width: 1px;
+  background: var(--signal);
+}
+
+.host__rim {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: var(--signal);
+  stroke-width: 1;
+  pointer-events: none;
+}
+.host__rim path { vector-effect: non-scaling-stroke; }
+.host__rim g { fill: var(--signal); stroke: none; }
+
+.host__info {
+  display: grid;
+  gap: clamp(12px, 1.8vh, 20px);
+  padding-bottom: clamp(48px, 12vh, 140px);
+}
+
+.host__note { color: var(--ink-soft); }
+.host__link { justify-self: start; }
+
+/* Tablets, phones and short screens: plain flow, no pin, so nothing is ever cut off. */
+@media (max-width: 1023px), (max-height: 619px) {
+  .host {
+    --frame-height: min(calc(86vw * 698 / 552), 740px, 92svh);
+    height: auto;
+    padding-top: clamp(96px, 16vh, 160px);
+    padding-bottom: clamp(56px, 9vh, 96px);
+  }
+  .host__anchor { top: clamp(40px, 8vh, 80px); }
+  .host__stage { position: relative; height: auto; overflow: visible; }
+  .host__grid { grid-template-columns: minmax(0, 1fr); row-gap: clamp(28px, 4vh, 44px); }
+  .host__title {
+    max-width: none;
+    font-size: calc(clamp(52px, 14vw, 132px) * var(--display-scale));
+  }
+  .host__frame { justify-self: center; }
+  .host__info { padding-bottom: 0; }
+
+  /* Nothing is pinned here to slide over. */
+  .about { margin-top: 0; }
+}
+
+/* Very tall screens: the photo's size cap would leave it low, so the arch and its text centre. */
+@media (min-width: 1024px) and (min-height: 1100px) {
+  .host__frame, .host__info { align-self: center; }
+  .host__info { padding-bottom: 0; }
+}
+
+.reduced .host {
+  --frame-height: min(calc(86vw * 698 / 552), 740px, 86svh);
+  height: auto;
+  margin-top: 0;
+  padding-block: clamp(96px, 14vh, 160px) clamp(56px, 9vh, 96px);
+}
+.reduced .host__anchor { top: 0; }
+.reduced .host__stage { position: relative; height: auto; overflow: visible; }
+.reduced .host__seam { display: none; }

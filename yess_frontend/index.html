@@ -44,6 +44,7 @@
 <link rel="stylesheet" href="css/hero.css">
 <link rel="stylesheet" href="css/sections.css">
 <link rel="stylesheet" href="css/highlights.css">
+<link rel="stylesheet" href="css/host.css">
 <link rel="stylesheet" href="css/marquee.css">
 <link rel="stylesheet" href="css/footer.css">
 </head>
@@ -59,6 +60,7 @@
     <ul class="nav__links">
       <li><a class="link" href="#highlights">Highlights</a></li>
       <li><a class="link" href="#when">When</a></li>
+      <li><a class="link" href="#host">Host</a></li>
       <li><a class="link" href="#about">About</a></li>
     </ul>
   </nav>
@@ -70,6 +72,7 @@
   <a href="#intro" aria-label="Summit introduction"><span></span></a>
   <a href="#highlights" aria-label="Highlights of YESS 25"><span></span></a>
   <a href="#when" aria-label="When"><span></span></a>
+  <a href="#host" aria-label="Meet our host"><span></span></a>
   <a href="#about" aria-label="About YESS"><span></span></a>
 </nav>
 
@@ -163,6 +166,42 @@
     </div>
   </section>
 
+  <section class="host" aria-labelledby="host-title">
+    <span class="host__anchor" id="host"></span>
+    <div class="host__stage">
+      <div class="host__grid wrap">
+        <!-- Text is set from CONFIG.HOST in js/config.js. This copy only shows if scripts fail to load. -->
+        <div class="host__head">
+          <p class="kicker" data-rise>THE HOST CAMPUS</p>
+          <h2 class="display host__title" id="host-title" data-reveal>Meet our host</h2>
+        </div>
+        <figure class="host__frame">
+          <div class="host__gate">
+            <div class="host__view">
+              <img src="img/host/host-campus-1024.webp" srcset="img/host/host-campus-640.webp 640w, img/host/host-campus-1024.webp 1024w" sizes="(max-width: 1023px) min(115vw, 960px), 960px" width="1024" height="768" loading="lazy" decoding="async" alt="The main building of Mar Baselios College of Engineering and Technology, with a statue of Christ above the entrance arch.">
+            </div>
+            <i class="host__seam" aria-hidden="true"></i>
+            <i class="host__seam" aria-hidden="true"></i>
+          </div>
+          <svg class="host__rim" viewBox="-16 -18 552 698" aria-hidden="true">
+            <defs>
+              <clipPath id="host-arch" clipPathUnits="objectBoundingBox">
+                <path transform="scale(0.00192308 0.00147059)" d="M0 680V300C0 180 130 70 260 0c130 70 260 180 260 300v380Z"/>
+              </clipPath>
+            </defs>
+            <path d="M0 680V300C0 180 130 70 260 0c130 70 260 180 260 300v380"/>
+            <path d="M-14 680V298C-14 172 122 56 260-16c138 72 274 188 274 314v382" opacity="0.45"/>
+            <g><circle cx="0" cy="300" r="4"/><circle cx="520" cy="300" r="4"/><circle cx="260" cy="0" r="4"/></g>
+          </svg>
+        </figure>
+        <div class="host__info">
+          <p class="lead host__name" data-rise>Mar Baselios College of Engineering and Technology</p>
+          <p class="host__note" data-rise>YESS 2026 gathers here. Venue details will be announced soon.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <section class="panel panel--forest about" id="about" aria-labelledby="about-label">
     <div class="wrap about__grid">
       <svg class="about__arch" viewBox="0 0 400 620" aria-hidden="true" data-parallax="0.14">
@@ -196,6 +235,7 @@
         <ul>
           <li><a class="link" href="#highlights">Highlights</a></li>
           <li><a class="link" href="#when">When</a></li>
+          <li><a class="link" href="#host">Host</a></li>
           <li><a class="link" href="#about">About</a></li>
         </ul>
         <ul>

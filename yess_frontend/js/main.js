@@ -3,6 +3,7 @@ import { initCountdown } from './countdown.js';
 import { initContact, initSocials } from './contact.js';
 import { initReel } from './reel.js';
 import { initMarquee } from './marquee.js';
+import { initHost } from './host.js';
 import { runPreloader, enterHero } from './preloader.js';
 import { initScroll, initReveals, initScenes, initSmokeDirector, initWordmark } from './motion/scroll.js';
 import { initCursor, initButtons } from './motion/pointer.js';
@@ -22,6 +23,7 @@ initContact();
 initSocials();
 initMarquee(document.querySelector('#marquee'), { reduced });
 initReel(document.querySelector('#reel'), { reduced });
+initHost(document.querySelector('.host'));
 initWordmark(document.querySelector('#wordmark'));
 
 // Smoke

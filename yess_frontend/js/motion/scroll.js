@@ -88,8 +88,10 @@ export function initScenes() {
     opacity: 0,
     y: () => -innerHeight * 0.04,
     ease: EASE.none,
-    scrollTrigger: { trigger: '#about', start: 'top 45%', end: 'top 2%', scrub: SCRUB.base },
+    scrollTrigger: { trigger: '.host', start: 'top 85%', end: 'top 40%', scrub: SCRUB.base },
   });
+
+  initHostGate();
 
   // Depth layers. Never applied to any logo.
   gsap.utils.toArray('[data-parallax]').forEach((element) => {
@@ -111,6 +113,30 @@ export function initScenes() {
   });
 }
 
+// --- Host: the closed gate parts along its centre seam onto the campus -------------------------
+// The photo is never scaled past its native size: the start scale stays inside the frame's cap.
+function initHostGate() {
+  const gate = document.querySelector('.host__gate');
+  const seams = gsap.utils.toArray('.host__seam');
+
+  const open = (scrollTrigger) => {
+    gsap.timeline({ defaults: { ease: EASE.none, duration: 1 }, scrollTrigger: { ...scrollTrigger, scrub: SCRUB.base, invalidateOnRefresh: true } })
+      .fromTo('.host__view', { clipPath: 'inset(0 50% 0 50%)' }, { clipPath: 'inset(0 0% 0 0%)' }, 0)
+      .fromTo('.host__view img', { scale: 1.06 }, { scale: 1 }, 0)
+      .fromTo(seams[0], { x: 0 }, { x: () => -gate.offsetWidth / 2 }, 0)
+      .fromTo(seams[1], { x: 0 }, { x: () => gate.offsetWidth / 2 }, 0);
+  };
+
+  gsap.matchMedia().add({
+    pinned: '(min-width: 1024px) and (min-height: 620px)',
+    flow: '(max-width: 1023px), (max-height: 619px)',
+  }, ({ conditions }) => {
+    open(conditions.pinned
+      ? { trigger: '.host', start: 'top 18%', end: 'top -60%' }
+      : { trigger: '.host__frame', start: 'top 85%', end: 'top 40%' });
+  });
+}
+
 // --- Smoke director: density, arch and brightness follow the page ------------------------------
 // Keys are [scrollY, density, arch, dim], rebuilt on refresh; state eases toward the interpolated
 // value every tick, so it needs no scrubbed tweens fighting over the same properties.
@@ -118,6 +144,7 @@ export function initSmokeDirector({ smoke, logo }) {
   if (!smoke) return;
 
   const whenBox = document.querySelector('#when-box');
+  const hostFrame = document.querySelector('.host__frame');
   const pageTop = (element) => element.getBoundingClientRect().top + scrollY;
 
   let keys = [];
@@ -125,6 +152,7 @@ export function initSmokeDirector({ smoke, logo }) {
   let coverEnd = 0;
   let aboutTop = Infinity;
   let focusSwitch = 0;
+  let hostSwitch = 0;
 
   function measure() {
     const vh = innerHeight;
@@ -133,7 +161,9 @@ export function initSmokeDirector({ smoke, logo }) {
     const introTop = pageTop(document.querySelector('#intro'));
     const whenTop = pageTop(document.querySelector('#when'));
     const highlightsTop = pageTop(highlights);
+    const hostTop = pageTop(document.querySelector('.host'));
     aboutTop = pageTop(document.querySelector('#about'));
+    hostSwitch = hostTop - vh * 0.5;
 
     coverStart = highlightsTop;
     coverEnd = highlightsTop + highlights.offsetHeight - vh;
@@ -146,7 +176,9 @@ export function initSmokeDirector({ smoke, logo }) {
       [highlightsTop - vh * 0.25, 0.55, 0, 0.56],
       [whenTop - vh, 0.5, 0, 0.5],
       [whenTop, 0.62, 1, 1],
-      [aboutTop, 0.62, 1, 1],
+      [hostSwitch, 0.62, 1, 1],
+      [hostTop, 0.6, 1, 0.8],
+      [aboutTop, 0.6, 1, 0.8],
     ];
   }
 
@@ -175,7 +207,7 @@ export function initSmokeDirector({ smoke, logo }) {
     state.arch += (arch - state.arch) * ease;
     state.dim += (dim - state.dim) * ease;
 
-    smoke.setFocus(y < focusSwitch ? logo : whenBox);
+    smoke.setFocus(y < focusSwitch ? logo : y < hostSwitch ? whenBox : hostFrame);
     smoke.setCovered((y > coverStart && y < coverEnd) || y >= aboutTop);
   });
 }
