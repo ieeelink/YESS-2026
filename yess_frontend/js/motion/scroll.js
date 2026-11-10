@@ -213,43 +213,58 @@ export function initSmokeDirector({ smoke, logo }) {
 }
 
 // --- Footer wordmark ------------------------------------------------------------------------
-// Fits the width whatever the display font's proportions, and the box to the letters' real ink,
-// so the word always shows whole. Very wide, short screens hold it to a share of the height,
-// which leaves room for the legal row in the same view.
-const MAX_SCREEN_HEIGHT = 0.78;
+// Sized from the footer container, so its ink meets the same edges as the columns and divider.
+// If that would be too tall, the height cap wins and the word sits centred, short of both edges.
+const MAX_SCREEN_HEIGHT = 0.22;
+const CLIP_ROOM = 1;  // px kept above and below the ink, so the clip never shaves a soft edge
 
 export function initWordmark(element) {
   const letters = [...element.querySelectorAll('span')];
-  const measureCanvas = document.createElement('canvas').getContext('2d');
 
+  // Measured on a canvas, never by resizing the live text: reduced motion puts a transition on
+  // every property, so a temporary font size would read back stale. A new canvas each time, because
+  // one that measured before the font loaded keeps the fallback's metrics.
   const fit = () => {
     const style = getComputedStyle(element);
-    element.style.height = 'auto';
-    element.style.fontSize = '100px';
-    letters.forEach((letter) => { letter.style.marginTop = '0'; });
-
-    const width = letters.reduce((sum, letter) => sum + letter.getBoundingClientRect().width, 0);
-    const gaps = (letters.length - 1) * parseFloat(style.columnGap || 0);
-    const available = element.parentElement.clientWidth * 0.965;
-
+    const measureCanvas = document.createElement('canvas').getContext('2d');
     measureCanvas.font = `${style.fontWeight} 100px ${style.fontFamily}`;
-    const metrics = measureCanvas.measureText('YESS');
+    const measure = (text) => measureCanvas.measureText(text);
+
+    const currentSize = parseFloat(style.fontSize);
+    const gap = parseFloat(style.columnGap || 0) / currentSize;
+    const lineHeight = parseFloat(style.lineHeight) / currentSize;
+    const width = letters.reduce((sum, letter) => sum + measure(letter.textContent).width, 0) / 100;
+
+    const metrics = measure(element.textContent);
     // Above and below the baseline, including the S's overshoot past the flat letters.
     const inkTop = metrics.actualBoundingBoxAscent / 100;
     const inkBottom = metrics.actualBoundingBoxDescent / 100;
     const content = (metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent) / 100;
-    const lineHeight = parseFloat(style.lineHeight) / 100;
     const baseline = (lineHeight - content) / 2 + metrics.fontBoundingBoxAscent / 100;
 
+    // Side bearings: the blank space a font leaves beside the first and last letters.
+    const first = measure(letters[0].textContent);
+    const last = measure(letters[letters.length - 1].textContent);
+    const bearingLeft = -first.actualBoundingBoxLeft / 100;
+    const bearingRight = (last.width - last.actualBoundingBoxRight) / 100;
+    const inkWidth = width + (letters.length - 1) * gap - bearingLeft - bearingRight;
+
     const inkHeight = inkTop + inkBottom;
-    const size = Math.min((100 * available) / (width + gaps), (innerHeight * MAX_SCREEN_HEIGHT) / inkHeight);
+    const size = Math.min(element.clientWidth / inkWidth, (innerHeight * MAX_SCREEN_HEIGHT) / inkHeight);
 
     element.style.fontSize = `${size}px`;
-    letters.forEach((letter) => { letter.style.marginTop = `${-(baseline - inkTop) * size}px`; });
-    element.style.height = `${inkHeight * size}px`;
+    letters.forEach((letter) => { letter.style.marginTop = `${CLIP_ROOM - (baseline - inkTop) * size}px`; });
+    // Trim both bearings so the row's box is exactly the ink; centring the box then centres the ink.
+    letters[0].style.marginLeft = `${-bearingLeft * size}px`;
+    letters[letters.length - 1].style.marginRight = `${-bearingRight * size}px`;
+    element.style.height = `${inkHeight * size + CLIP_ROOM * 2}px`;
   };
 
   fit();
-  document.fonts.ready.then(fit);
+  const { fontWeight, fontFamily } = getComputedStyle(element);
+  document.fonts.load(`${fontWeight} 100px ${fontFamily}`, element.textContent).then(() => {
+    fit();
+    ScrollTrigger.refresh();
+  });
   addEventListener('resize', fit, { passive: true });
 }

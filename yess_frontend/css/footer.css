@@ -84,7 +84,7 @@
   flex-wrap: wrap;
   justify-content: center;
   gap: 12px 32px;
-  margin-top: clamp(16px, 2.4vh, 28px);
+  margin-top: clamp(28px, 4.4vh, 52px);
   padding-block: 16px 20px;
   border-top: 1px solid var(--line);
   font-size: 14px;
@@ -100,22 +100,24 @@
 .footer__social { display: flex; flex-wrap: wrap; gap: 18px; }
 .footer__social[hidden] { display: none; }
 
-/* Typography, not the logo: whole letters in the display face. The clip is only for their rise. */
+/* Typography, not the logo: one line in the display face, sized in JS from the container.
+   The vertical clip is only for the letters' rise; the size below shows if scripts fail to load. */
 .wordmark {
   display: flex;
   justify-content: center;
-  gap: 0.015em;
+  gap: 0.035em;
   margin-top: clamp(40px, 7vh, 80px);
-  overflow: hidden;
+  overflow-y: clip;
   font-family: var(--font-display);
-  font-size: 40vw;
+  font-size: min(20vw, 22vh);
   font-weight: 900;
   line-height: 1;
+  white-space: nowrap;
   color: var(--white);
   user-select: none;
   pointer-events: none;
 }
-.wordmark span { display: block; will-change: transform; }
+.wordmark span { display: block; }
 
 @media (max-width: 820px) {
   .footer__top { grid-template-columns: 1fr; }
