@@ -12,6 +12,12 @@ export function initGallery() {
   const now = document.getElementById("hlNow")!;
   const pad = (n: number) => String(n).padStart(2, "0");
   let current = -1;
+  let autoplay = 0;
+  const stopAutoplay = () => { clearInterval(autoplay); };
+  const startAutoplay = () => {
+    stopAutoplay();
+    if (!reducedMotion && plates.length > 1) autoplay = window.setInterval(() => goTo((current + 1) % plates.length), 3800);
+  };
 
   const centreOf = (el: HTMLElement) => el.offsetLeft + el.offsetWidth / 2;
   const focus = () => {
@@ -32,11 +38,11 @@ export function initGallery() {
   let raf = 0;
   strip.addEventListener("scroll", () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(focus); }, { passive: true });
   addEventListener("resize", focus);
-  document.getElementById("hlPrev")!.addEventListener("click", () => goTo(current - 1));
-  document.getElementById("hlNext")!.addEventListener("click", () => goTo(current + 1));
+  document.getElementById("hlPrev")!.addEventListener("click", () => { goTo((current - 1 + plates.length) % plates.length); startAutoplay(); });
+  document.getElementById("hlNext")!.addEventListener("click", () => { goTo((current + 1) % plates.length); startAutoplay(); });
   strip.addEventListener("keydown", e => {
-    if (e.key === "ArrowRight") { e.preventDefault(); goTo(current + 1); }
-    if (e.key === "ArrowLeft") { e.preventDefault(); goTo(current - 1); }
+    if (e.key === "ArrowRight") { e.preventDefault(); goTo((current + 1) % plates.length); startAutoplay(); }
+    if (e.key === "ArrowLeft") { e.preventDefault(); goTo((current - 1 + plates.length) % plates.length); startAutoplay(); }
     if (e.key === "Home") { e.preventDefault(); goTo(0); }
     if (e.key === "End") { e.preventDefault(); goTo(plates.length - 1); }
   });
@@ -45,7 +51,7 @@ export function initGallery() {
   let down = false, startX = 0, startLeft = 0, lastX = 0, lastT = 0, v = 0, glide = 0, moved = 0;
   strip.addEventListener("pointerdown", e => {
     if (e.pointerType !== "mouse" || e.button !== 0) return;
-    down = true; moved = 0; startX = lastX = e.clientX; startLeft = strip.scrollLeft; lastT = performance.now(); v = 0;
+    stopAutoplay(); down = true; moved = 0; startX = lastX = e.clientX; startLeft = strip.scrollLeft; lastT = performance.now(); v = 0;
     cancelAnimationFrame(glide); strip.classList.add("is-drag"); strip.setPointerCapture(e.pointerId);
   });
   strip.addEventListener("pointermove", e => {
@@ -71,7 +77,14 @@ export function initGallery() {
   };
   strip.addEventListener("pointerup", release);
   strip.addEventListener("pointercancel", release);
+  strip.addEventListener("pointerup", startAutoplay);
+  strip.addEventListener("pointercancel", startAutoplay);
+  strip.addEventListener("mouseenter", stopAutoplay);
+  strip.addEventListener("mouseleave", startAutoplay);
+  strip.addEventListener("focusin", stopAutoplay);
+  strip.addEventListener("focusout", startAutoplay);
   strip.addEventListener("click", e => { if (moved > 6) { e.preventDefault(); e.stopPropagation(); } }, true);
 
   focus();
+  startAutoplay();
 }

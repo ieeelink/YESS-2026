@@ -1,55 +1,33 @@
-/**
- * The light reveals the crowd. On every load the hero's beam sweeps once across last year's crowd
- * (about 1.2 s) and settles at its resting line. On the first visit of a session the type waits behind
- * it: everything but the lit crowd is dark, and once the beam has settled the page opens outward from
- * the beam's line like a pair of doors (about 0.85 s). The opening uses the same vw position as the beam,
- * so it starts exactly where the light rests at every breakpoint.
- *
- * Nothing is locked: any key, click, touch or scroll finishes it at once. Never with reduced motion
- * (decided before first paint in index.html, where the beam also starts at rest); ?intro=1 forces the
- * reveal, ?intro=0 skips it. The earlier title-card trailer is in git history (commit 7079529).
- */
+/** A minimal loading scale followed by a quick fade into the event page. */
 export function runIntro(done: () => void) {
   const root = document.documentElement;
-  const sweep = () => root.classList.add("sweep");
-  // two frames: the beam's starting position must paint once before it moves
-  const nextPaint = (fn: () => void) => requestAnimationFrame(() => requestAnimationFrame(fn));
+  const overlay = document.querySelector<HTMLElement>(".intro");
+  if (!overlay || !root.classList.contains("has-intro")) { done(); return; }
 
-  if (!root.classList.contains("has-intro")) { done(); nextPaint(sweep); return; }
-  try { sessionStorage.setItem("yess26-intro", "1"); } catch { /* private mode: it may replay, that is fine */ }
-  if ("scrollRestoration" in history) history.scrollRestoration = "manual";
-  scrollTo(0, 0);
-
-  const timers: number[] = [];
-  const at = (ms: number, fn: () => void) => timers.push(window.setTimeout(fn, ms));
-  const inputs = ["keydown", "pointerdown", "wheel", "touchstart"] as const;
-  let opened = false, ended = false;
-
-  const open = () => {
-    if (opened) return;
-    opened = true;
-    root.classList.add("opened");
-    done();
-  };
-  const end = () => {
+  const label = document.getElementById("loadPercent");
+  const bar = document.getElementById("loadProgress");
+  let start = 0, raf = 0, ended = false;
+  const duration = 1900;
+  const finish = () => {
     if (ended) return;
     ended = true;
-    timers.forEach(clearTimeout);
-    inputs.forEach(t => removeEventListener(t, skip));
-    root.classList.remove("has-intro", "opened", "fast");
+    cancelAnimationFrame(raf);
+    if (label) label.textContent = "100%";
+    if (bar) bar.style.width = "100%";
+    root.classList.add("loading-complete");
+    done();
+    window.setTimeout(() => { root.classList.remove("has-intro", "loading-complete"); overlay.remove(); }, 500);
   };
-  const skip = () => {
+  const progress = (now: number) => {
     if (ended) return;
-    timers.forEach(clearTimeout);
-    root.classList.add("fast", "sweep");
-    open();
-    window.setTimeout(end, 380);
+    if (!start) start = now;
+    const p = Math.min(1, (now - start) / duration);
+    const eased = p * p * (3 - 2 * p);
+    const value = Math.min(100, Math.max(1, Math.floor(1 + eased * 99)));
+    if (label) label.textContent = `${String(value).padStart(2, "0")}%`;
+    if (bar) bar.style.width = `${value}%`;
+    if (p >= 1) { finish(); return; }
+    raf = requestAnimationFrame(progress);
   };
-  inputs.forEach(t => addEventListener(t, skip, { passive: true }));
-
-  nextPaint(() => {
-    sweep(); //            0.00–1.20 s  the beam sweeps across the crowd and settles
-    at(900, open); //      0.90–1.75 s  the page opens outward from the beam's line
-    at(1800, end); //      1.80 s       done
-  });
+  window.setTimeout(() => { if (overlay.isConnected) raf = requestAnimationFrame(progress); }, 140);
 }

@@ -36,14 +36,14 @@ export function initNav() {
   const reveal = new IntersectionObserver(es => {
     for (const e of es) if (e.isIntersecting) { e.target.classList.add("in"); reveal.unobserve(e.target); }
   }, { rootMargin: "0px 0px -12% 0px", threshold: 0 });
-  document.querySelectorAll(".sec, .final, .foot, #footMark").forEach(s => reveal.observe(s));
+  document.querySelectorAll(".sec, .host-scene, .final, .foot, #footMark").forEach(s => reveal.observe(s));
 
   // phone menu: full screen; Escape and any link close it
   const menu = document.getElementById("menu")!, btn = document.getElementById("menuBtn")!;
   const setMenu = (open: boolean) => {
     menu.hidden = !open;
     btn.setAttribute("aria-expanded", String(open));
-    btn.textContent = open ? "Close" : "Menu";
+    btn.setAttribute("aria-label", open ? "Close navigation" : "Open navigation");
     root.classList.toggle("menu-open", open);
   };
   btn.addEventListener("click", () => setMenu(menu.hidden));

@@ -30,6 +30,8 @@ function contentTokens(): Plugin {
           EVENT_NAME: esc(CONFIG.EVENT_NAME),
           EVENT_FULL_NAME: esc(CONFIG.EVENT_FULL_NAME),
           DATE_DAY_MONTH: esc(CONFIG.DATE_DAY_MONTH),
+          DATE_DAY: esc(CONFIG.DATE_DAY_MONTH.split(" ")[0]),
+          DATE_MONTH: esc(CONFIG.DATE_DAY_MONTH.split(" ").slice(1).join(" ")),
           DATE_YEAR: esc(CONFIG.DATE_YEAR),
           HOURS_LABEL: esc(CONFIG.HOURS_LABEL),
           HOURS_SHORT: esc(CONFIG.HOURS_SHORT),

@@ -43,7 +43,7 @@ export const FAQ: Faq[] = [
   { placeholder: true, q: "Is there a registration fee?",
     a: "Fee details will be announced when registration opens." },
   { placeholder: true, q: "What is on the programme?",
-    a: "Sessions, speakers and tracks will be announced on this page. The day runs from 9:00 AM to 5:00 PM IST. The hours are provisional." },
+    a: "Sessions, speakers and tracks will be announced on this page. The day runs from 9:00 AM to 6:00 PM IST. The hours are provisional." },
   { placeholder: true, q: "How do I get to the venue?",
     a: "Use Get directions in the Venue section to open the route in Google Maps. Travel details will be announced." },
   { placeholder: true, q: "Who do I contact with a question?",

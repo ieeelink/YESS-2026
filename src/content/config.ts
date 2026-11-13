@@ -9,14 +9,14 @@ export const CONFIG = {
   EVENT_NAME: "IEEE YESS 2026",
   EVENT_FULL_NAME: "Yearly Engineering Students Summit",
 
-  /** Provisional: one day, 9:00 AM to 5:00 PM IST. The countdown runs to START. */
+  /** Provisional: one day, 9:00 AM to 6:00 PM IST. The countdown runs to START. */
   START: "2026-12-19T09:00:00+05:30",
-  END: "2026-12-19T17:00:00+05:30",
+  END: "2026-12-19T18:00:00+05:30",
   DATE_DAY_MONTH: "19 December",
   DATE_YEAR: "2026",
-  HOURS_LABEL: "9:00 AM – 5:00 PM IST",
+  HOURS_LABEL: "9:00 AM – 6:00 PM IST",
   /** The same hours, short, for the hero's info line. */
-  HOURS_SHORT: "9 AM – 5 PM IST",
+  HOURS_SHORT: "9 AM – 6 PM IST",
 
   VENUE_NAME: "Mar Baselios College of Engineering and Technology (Autonomous)",
   /** The hero line and the final call use the short name; the venue section sets it in two lines. */
