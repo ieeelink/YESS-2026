@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Concept C · The Citadel</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+  /* end-card: everything anchored to the bottom-left corner of the grid */
+  .lockup { position: absolute; left: var(--margin); bottom: 56px; display: grid; width: min(90vw, 640px); }
+  .lockup .logo { margin-bottom: 36px; width: clamp(220px, 25vw, 380px); }
+  .lockup .label { margin-bottom: 12px; }
+  .lockup .date { margin-bottom: 24px; }
+  .lockup .facts { margin-bottom: 32px; }
+
+  .side { position: absolute; right: var(--margin); bottom: 56px; display: grid; justify-items: end; gap: 18px; }
+  .side .count b { font-size: clamp(28px, 2.6vw, 40px); }
+  .rail { position: absolute; right: var(--margin); top: 50%; transform: translateY(-60%); display: grid; gap: 14px; justify-items: end; }
+  .rail a { font-size: 14px; line-height: 20px; color: var(--w64); display: flex; gap: 12px; align-items: center; }
+  .rail a::after { content: ""; width: 18px; height: 1px; background: var(--w40); }
+  .rail a:first-child { color: var(--white); }
+  .rail a:first-child::after { width: 40px; background: var(--signal); }
+  .nav__links { visibility: hidden; }
+  .facts i, .go b { font-style: normal; font-weight: inherit; }
+
+  @media (max-width: 760px) {
+    .lockup { bottom: 100px; right: var(--margin); width: auto; }
+    .lockup .logo { margin-bottom: 22px; }
+    .lockup .date { font-size: 47px; margin-bottom: 14px; }
+    .lockup .date span { color: var(--white); }
+    .lockup .facts { margin-bottom: 18px; }
+    .facts i, .go b, .rail { display: none; }
+    .side { left: var(--margin); right: auto; bottom: 26px; justify-items: start; }
+    .side > .label { display: none; }
+    .side .count { gap: 20px; }
+  }
+  .go b { font-weight: inherit; }
+</style>
+</head>
+<body>
+<canvas id="gl"></canvas>
+
+<header class="nav">
+  <div class="nav__mark label"><i></i><span>19 · 12 · 2026</span><span>Thiruvananthapuram</span></div>
+  <nav class="nav__links"><a>Summit</a></nav>
+  <div class="nav__end label">Menu</div>
+</header>
+
+<main class="hero">
+  <nav class="rail"><a>Summit</a><a>Highlights</a><a>Venue</a><a>Programme</a><a>Partners</a><a>FAQ</a></nav>
+
+  <div class="lockup">
+    <img class="logo" src="../../assets/YESS_Logo.svg" alt="IEEE YESS, Yearly Engineering Students Summit 2026">
+    <p class="label">One day · 9:00 AM to 5:00 PM IST</p>
+    <p class="date">19 December <span>2026</span></p>
+    <p class="facts">
+      <b>Mar Baselios College of Engineering and Technology (Autonomous)</b>
+      <span>Thiruvananthapuram<i> · Organized by IEEE LINK, IEEE Kerala Section</i></span>
+    </p>
+    <div class="actions">
+      <span class="state"><i></i>Registration opens soon<em>Get notified</em></span>
+      <a class="go"><span>Explore<b> the summit</b></span>
+        <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 3v12M4 10l5 5 5-5"/></svg>
+      </a>
+    </div>
+  </div>
+
+  <div class="side">
+    <p class="label">Doors open in</p>
+    <div class="count">
+      <div><b>37</b><span class="label">Days</span></div>
+      <div><b>11</b><span class="label">Hrs</span></div>
+      <div><b>04</b><span class="label">Min</span></div>
+      <div><b>52</b><span class="label">Sec</span></div>
+    </div>
+  </div>
+</main>
+
+<script id="fs" type="x-shader/x-fragment">
+// uA.x = citadel centre (px), uA.y = its base line (px from bottom), uA.z = half-width (px), uA.w = height / half-width
+float ridge(float x, float seed){ return fbm(vec2(x, seed)); }
+
+// stepped mass: blocks of varying width whose tops follow a broken pyramid
+float citadel(float x){
+  float t = (x - uA.x) / uA.z;                       // -1..1 across the mass
+  float h = 0.0;
+  for (int i = 0; i < 3; i++) {
+    float n = i == 0 ? 5.0 : (i == 1 ? 13.0 : 37.0);
+    float b = (floor(t * n + 0.5 * float(i)) + 0.5 - 0.5 * float(i)) / n;       // block centre
+    float env = pow(max(1.0 - abs(b) * (1.0 + 0.10 * float(i)), 0.0), i == 0 ? 0.62 : 0.95);
+    float rnd = hash11(b * 91.7 + float(i) * 13.0);
+    float steps = i == 0 ? 6.0 : 14.0;
+    float hh = floor(env * (0.70 + 0.34 * rnd) * steps) / steps;
+    hh *= i == 2 ? step(0.88, rnd) * 1.06 : 1.0;                                  // thin spires, only a few
+    h = max(h, hh * (i == 2 ? env * 0.9 + 0.1 : 1.0));
+  }
+  return h * step(abs(t), 1.0);
+}
+
+void main(){
+  vec2 frag = gl_FragCoord.xy;
+  vec2 q = frag / uRes;
+  float asp = uRes.x / uRes.y;
+  float x = q.x * asp;
+  vec2 src = vec2(uA.x, uA.y + uA.z * uA.w * 0.42);            // the light sits behind the mass
+  vec2 sp = (frag - src) / uRes.y;
+  float sd = length(sp);
+
+  // ---- sky: backlight, cloud deck, rays fanning out from behind
+  float glow = exp(-sd / 0.16) * 0.95 + exp(-sd / 0.55) * 0.22;
+  vec2 cp = vec2(x * 0.9, q.y * 2.4);
+  float cloud = fbm(cp + vec2(fbm(cp * 1.7 + 4.0) * 1.5, 0.0));
+  float deck = smoothstep(0.38, 0.9, cloud);
+  float ang = atan(sp.y, sp.x);
+  float rays = smoothstep(0.42, 0.85, fbm(vec2(ang * 5.5, 1.7))) * smoothstep(0.30, 0.75, fbm(vec2(ang * 17.0, 9.0)) + 0.25);
+  rays *= exp(-sd / 0.55) * step(0.0, sp.y + 0.05);
+  float L = glow * (0.35 + 1.1 * deck) + rays * 0.16 + deck * 0.03;
+  vec3 col = fire(L);
+  col += FOREST * 0.06;
+
+  // ---- layers, far to near
+  float baseY = uA.y / uRes.y;
+  for (int i = 0; i < 6; i++) {
+    float fi = float(i);
+    float depth = fi / 5.0;                                    // 0 far .. 1 near
+    float h = baseY + 0.10 - fi * 0.062 + (0.05 + 0.03 * fi) * (ridge(x * (1.1 + fi * 0.55) + fi * 17.0, fi * 3.7) - 0.5) * 2.0;
+    float isCit = 0.0;
+    if (i == 1) {
+      float c = citadel(frag.x) * uA.z * uA.w / uRes.y;
+      if (baseY + c > h) { isCit = 1.0; }
+      h = max(h, baseY + c);
+    }
+    float m = smoothstep(0.0015, -0.0015, q.y - h);            // inside this layer
+    float aerial = mix(0.85, 0.0, pow(depth, 0.7));            // far layers dissolve into the lit air
+    float lightHere = exp(-abs(frag.x - src.x) / uRes.y / 0.55);
+    vec3 air = FOREST * (0.30 + 1.9 * lightHere) + SIGNAL * 0.16 * lightHere * lightHere;
+    vec3 layer = mix(vec3(0.004, 0.008, 0.006), air, aerial * 0.42);
+    // ground fog pooled at the foot of each layer
+    float below = clamp((h - q.y) / 0.16, 0.0, 1.0);
+    float fogN = fbm(vec2(x * 1.6 + fi * 5.0, q.y * 7.0 + fi));
+    layer = mix(layer, air * (0.75 + 0.5 * fogN), below * below * (0.80 - 0.62 * depth));
+    if (isCit > 0.5) {
+      // terraces: faint ledges catching the back light, and a scatter of lit openings
+      float yy = (q.y - baseY) * uRes.y / (uA.z * uA.w);
+      float ledge = smoothstep(0.035, 0.0, abs(fract(yy * 14.0) - 0.5)) * 0.045;
+      vec2 wc = vec2(floor(frag.x / uRes.y * 210.0), floor(yy * 56.0));
+      vec2 wf = fract(vec2(frag.x / uRes.y * 210.0, yy * 56.0)) - 0.5;
+      float win = step(0.9945, hash21(wc)) * smoothstep(0.34, 0.1, abs(wf.x)) * smoothstep(0.42, 0.2, abs(wf.y));
+      layer += FOREST * ledge * 3.0 + fire(win * (0.5 + 0.9 * hash21(wc + 9.0))) * (1.0 - below * 0.8);
+    }
+    // rim: the top edge of each layer catches the light
+    float rim = smoothstep(0.006, 0.0, h - q.y) * step(q.y, h) * lightHere * (1.0 - depth) * 0.5;
+    layer += fire(rim);
+    col = mix(col, layer, m);
+  }
+
+  // ---- smoke standing off the mass, leaning with the wind
+  for (int i = 0; i < 3; i++) {
+    float fi = float(i);
+    float px = uA.x + uA.z * (fi == 0.0 ? -0.46 : (fi == 1.0 ? 0.20 : 0.62));
+    float py = uA.y + uA.z * uA.w * (fi == 0.0 ? 0.50 : (fi == 1.0 ? 0.86 : 0.36));
+    vec2 d = (frag - vec2(px, py)) / uRes.y;
+    float up_ = max(d.y, 0.0);
+    float cx = d.x - up_ * up_ * 1.1 - 0.05 * (fbm(vec2(up_ * 5.0, fi * 9.0)) - 0.5);
+    float w = 0.012 + up_ * 0.24;
+    float body = smoothstep(w, 0.0, abs(cx)) * smoothstep(0.0, 0.03, d.y) * smoothstep(0.75, 0.05, up_);
+    float tex = fbm(vec2(cx * 9.0, up_ * 6.0 - fi * 4.0) + fbm(d * 7.0 + fi) * 1.2);
+    float a = body * smoothstep(0.25, 0.75, tex) * 0.7;
+    vec3 sc = mix(vec3(0.004, 0.012, 0.008), fire(0.75 * exp(-length(frag - src) / uRes.y / 0.5)), smoothstep(0.45, 0.95, tex));
+    col = mix(col, sc, a);
+  }
+
+  // ---- embers
+  vec2 s = frag / uRes.y;
+  for (int i = 0; i < 2; i++) {
+    float sc = i == 0 ? 24.0 : 42.0;
+    vec2 g = s * sc; vec2 id = floor(g); vec2 f = fract(g) - 0.5;
+    vec2 o = (hash22(id + float(i) * 31.0) - 0.5) * 0.8;
+    float keep = step(0.955, hash21(id * 1.7 + 5.0));
+    col += fire(exp(-dot(f - o, f - o) * (i == 0 ? 1100.0 : 1800.0)) * keep * exp(-sd / 0.7) * 2.2);
+  }
+
+  gl_FragColor = vec4(finish(col, frag), 1.0);
+}
+</script>
+<script>
+  window.sceneParams = (w, h) => {
+    const phone = w < 760;
+    // centre x, base line (from top, converted in gl.js), half width, height ratio
+    return phone ? [w * 0.56, h * 0.47, w * 0.62, 0.78] : [w * 0.66, h * 0.60, Math.min(w * 0.32, h * 0.62), 0.74];
+  };
+</script>
+<script src="gl.js"></script>
+</body>
+</html>

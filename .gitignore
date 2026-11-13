@@ -14,3 +14,6 @@ skills-lock.json
 # Local archives and deps
 *.zip
 node_modules/
+
+# Build output
+dist/

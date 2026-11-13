@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#030705">
+<title>D · Kerala Converges — IEEE YESS 2026 hero prototype</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+  .dive { height: 260vh; }
+  .lockup { position: absolute; z-index: 5; left: var(--margin); top: 50%; transform: translateY(-48%); width: min(46vw, 620px); display: grid; }
+  .lockup .logo { margin-bottom: 40px; }
+  .lockup .label { margin-bottom: 14px; }
+  .lockup .date { margin-bottom: 26px; }
+  .lockup .facts { margin-bottom: 36px; max-width: 30em; }
+  .side { position: absolute; z-index: 5; right: var(--margin); bottom: 36px; display: grid; gap: 14px; justify-items: end; }
+  .pinlabel { position: absolute; z-index: 4; left: 0; top: 0; padding-left: 26px; white-space: nowrap; pointer-events: none; }
+  .pinlabel b { display: block; font-weight: 500; font-size: 13px; line-height: 16px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--white); }
+  .pinlabel span { font-size: 11px; line-height: 16px; letter-spacing: 0.14em; color: var(--w64); }
+
+  /* the next section is written inside the pin: a circle that opens from the pin's position */
+  .next { position: fixed; inset: 0; z-index: 10; background: var(--ground); clip-path: circle(0px at 50% 50%); display: grid; align-items: center; padding: 0 var(--margin); visibility: hidden; }
+  .next__in { max-width: 920px; }
+  .next h2 { font-family: var(--font-display); font-weight: 800; text-transform: uppercase; font-size: clamp(47px, 7vw, 116px); line-height: 0.9; margin: 18px 0 32px; color: var(--white); }
+  .next p.body { font-size: clamp(18px, 1.7vw, 24px); line-height: 1.5; color: var(--w92); max-width: 34em; }
+  .next .ring { position: absolute; inset: 0; pointer-events: none; border-radius: 50%; }
+
+  .diving .nav, .diving .hud { opacity: 0 !important; transition-delay: 0s !important; }
+  @media (max-width: 760px) {
+    .lockup { top: auto; bottom: 96px; transform: none; width: auto; right: var(--margin); }
+    .lockup .logo { margin-bottom: 20px; }
+    .lockup .label { margin-bottom: 8px; }
+    .lockup .date { margin-bottom: 14px; }
+    .lockup .facts { margin-bottom: 18px; }
+    .side { left: var(--margin); right: auto; bottom: 26px; justify-items: start; }
+    .side > .label { display: none; }
+    .pinlabel { display: none; }
+    .date .rv { display: inline-block; vertical-align: top; margin-right: 0.22em; }
+  }
+</style>
+</head>
+<body>
+<div class="badge">Prototype D · Kerala Converges</div>
+
+<div class="dive" id="dive">
+  <div class="stage" id="stage">
+    <div class="still"></div>
+    <canvas id="gl" aria-hidden="true"></canvas>
+
+    <header class="nav fade" id="nav" style="--d:1500ms">
+      <div class="nav__mark label"><i></i><span>19 · 12 · 2026</span><span>Thiruvananthapuram</span></div>
+      <nav class="nav__links"><a href="#">Summit</a><a href="#">Highlights</a><a href="#">Venue</a><a href="#">Programme</a><a href="#">Partners</a><a href="#">FAQ</a></nav>
+      <div class="nav__end label">Menu</div>
+    </header>
+
+    <div class="pinlabel" id="pinlabel"><div class="fade" style="--d:1700ms"><b>Thiruvananthapuram</b><span>8.52° N · 76.94° E</span></div></div>
+
+    <main class="lockup" id="lockup">
+      <h1 style="position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)">IEEE YESS 2026, Yearly Engineering Students Summit</h1>
+      <div class="fade" style="--d:1100ms"><img class="logo" src="../../assets/YESS_Logo.svg" width="1202" height="463" alt="IEEE YESS, Yearly Engineering Students Summit 2026"></div>
+      <p class="label rv" style="--d:1250ms;--i:0"><span>One day · 9:00 AM to 5:00 PM IST</span></p>
+      <p class="date"><span class="rv" style="--d:1250ms;--i:1"><b style="font-weight:inherit;color:#fff">19 December</b></span><span class="rv" style="--d:1250ms;--i:2"><span>2026</span></span></p>
+      <p class="facts">
+        <b class="rv" style="--d:1250ms;--i:4"><span>Mar Baselios College of Engineering and Technology (Autonomous)</span></b>
+        <span class="rv" style="--d:1250ms;--i:5"><span>Thiruvananthapuram<i> · Organized by IEEE LINK, IEEE Kerala Section</i></span></span>
+      </p>
+      <div class="actions fade" style="--d:1250ms;--i:7">
+        <span class="state" role="status"><i></i>Registration opens soon<em>Get notified</em></span>
+        <a class="go" href="#dive"><span>Explore<b> the summit</b></span>
+          <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M9 3v12M4 10l5 5 5-5"/></svg>
+        </a>
+      </div>
+    </main>
+
+    <div class="side fade" id="side" style="--d:1900ms">
+      <p class="label">Doors open in</p>
+      <div class="count" id="count" role="timer" aria-label="Time until IEEE YESS 2026 begins">
+        <div><b data-cd="d">00</b><span class="label">Days</span></div>
+        <div><b data-cd="h">00</b><span class="label">Hrs</span></div>
+        <div><b data-cd="m">00</b><span class="label">Min</span></div>
+        <div><b data-cd="s">00</b><span class="label">Sec</span></div>
+      </div>
+    </div>
+    <div class="hud label fade" style="--d:2200ms"><i></i>Scroll to dive in</div>
+  </div>
+</div>
+
+<section class="next" id="next" aria-label="About the summit">
+  <div class="next__in">
+    <p class="label rv"><span>IEEE YESS 2026 · Yearly Engineering Students Summit</span></p>
+    <h2><span class="rv" style="--i:1"><span>Everyone ends up</span></span><span class="rv" style="--i:2"><span>in one room.</span></span></h2>
+    <p class="body fade" style="--i:5">IEEE YESS is the Yearly Engineering Students Summit, an annual IEEE gathering for engineering students. It is a space to learn, connect and build alongside fellow students.</p>
+  </div>
+</section>
+
+<script id="fs" type="x-shader/x-fragment">
+uniform sampler2D uMask, uTrail;
+uniform vec3 uRo, uTa;
+uniform vec2 uShift, uPin, uSafe;
+uniform float uF, uIntro, uPulse, uDive, uFlare;
+
+vec2 muv(vec2 p){ return vec2((p.x + 0.9) / 2.75, (p.y + 0.6) / 5.5); }
+float land(vec2 p){ return texture2D(uMask, muv(p)).r; }
+float soft(vec2 p){ return texture2D(uMask, muv(p)).g; }
+// stylised relief: a bevel from the coast inward plus broken ground. Not elevation data.
+float height(vec2 p){
+  float s = soft(p);
+  return s * 0.9 + (fbm(p * 5.0 + 3.0) - 0.5) * 0.85 * s;
+}
+
+void main(){
+  vec2 frag = gl_FragCoord.xy;
+  vec2 uv = (frag - 0.5 * uRes) / uRes.y - uShift;
+  vec3 fw = normalize(uTa - uRo);
+  vec3 rt = normalize(cross(fw, vec3(0.0, 0.0, 1.0)));
+  vec3 up = cross(rt, fw);
+  vec3 rd = normalize(fw * uF + rt * uv.x + up * uv.y);
+  vec3 haze = FOREST * 0.16;
+  vec3 col;
+  float dist = 60.0;
+
+  if (rd.z < -0.002) {
+    const float H = 0.035;
+    float tT = (H - uRo.z) / rd.z;
+    float tB = -uRo.z / rd.z;
+    vec3 Pt = uRo + rd * tT, Pb = uRo + rd * tB;
+    float top = step(0.5, land(Pt.xy)) * step(0.0, tT);
+    float wall = 0.0; float wf = 0.0;
+    if (top < 0.5) {
+      for (int i = 1; i <= 6; i++) {
+        float f = float(i) / 6.0;
+        if (wall < 0.5 && land(mix(Pt.xy, Pb.xy, f)) > 0.5) { wall = 1.0; wf = f; }
+      }
+    }
+    vec3 P = top > 0.5 ? Pt : Pb;
+    dist = top > 0.5 ? tT : tB;
+    float d = length(P.xy);
+
+    if (top > 0.5) {
+      vec2 e = vec2(0.012, 0.0);
+      float h0 = height(P.xy);
+      vec3 n = normalize(vec3(h0 - height(P.xy + e.xy), h0 - height(P.xy + e.yx), 0.045));
+      vec3 toPin = vec3(0.0, 0.0, 0.10) - vec3(P.xy, 0.0);
+      float diffPin = max(dot(n, normalize(toPin)), 0.0) / (1.0 + dot(toPin, toPin) * 2.2);
+      float moon = max(dot(n, normalize(vec3(-0.55, 0.45, 0.6))), 0.0);
+      float grain = 0.85 + 0.3 * fbm3(P.xy * 14.0);
+      col = vec3(0.016, 0.026, 0.022) * (0.25 + 1.6 * moon) * grain;
+      col += SIGNAL * min(diffPin, 0.8) * 0.5 * uIntro * (1.0 - 0.7 * uDive);
+      float coast = 1.0 - smoothstep(0.45, 0.98, soft(P.xy));
+      col += FOREST * coast * 0.9 + SIGNAL * pow(coast, 3.0) * 0.10;
+    } else if (wall > 0.5) {
+      col = mix(FOREST * 0.75 + SIGNAL * 0.05, vec3(0.004, 0.012, 0.008), wf);
+    } else {
+      // sea: near-black, a faint graticule every half degree, light spilling off the coast
+      float a = 0.4451;                                   // 25.5 deg: undo the rotation that stands the state upright
+      vec2 ll = vec2(P.x * cos(a) - P.y * sin(a), P.x * sin(a) + P.y * cos(a)) * 2.0;
+      float w = 0.004 + dist * 0.006;
+      vec2 g = abs(fract(ll) - 0.5);
+      float grid = smoothstep(0.5 - w * 2.0, 0.5, max(g.x, g.y));
+      col = vec3(0.003, 0.007, 0.006) + FOREST * 0.20 * grid * exp(-dist * 0.22);
+      col += FOREST * 0.75 * soft(P.xy);
+    }
+
+    // light arriving: trails (with a cheap bloom) and rings leaving the pin
+    vec2 m = muv(P.xy);
+    float tr = texture2D(uTrail, m).r;
+    float bl = 0.0;
+#ifdef HIGH
+    for (int i = 0; i < 6; i++) { float an = float(i) * 1.047; bl += texture2D(uTrail, m + vec2(cos(an), sin(an) * 0.5) * 0.010).r; }
+    bl /= 6.0;
+#endif
+    float onLand = max(top, wall);
+    col += fire((tr * 1.9 + bl * 1.1) * (0.35 + 0.65 * onLand)) * uIntro;
+    for (int k = 0; k < 3; k++) {
+      float ph = fract(uTime * 0.22 + float(k) / 3.0);
+      float r = ph * 1.3;
+      col += fire(exp(-abs(d - r) / (0.004 + r * 0.012)) * (1.0 - ph) * 0.9) * uIntro;
+    }
+    col += fire(exp(-d / 0.05) * (0.9 + uPulse * 1.4)) * uIntro;
+    col = mix(col, haze, 1.0 - exp(-dist * 0.17));
+  } else {
+    col = haze * exp(-max(rd.z, 0.0) * 5.0) + FOREST * 0.05 * fbm(rd.xy * 3.0 + uTime * 0.01);
+  }
+
+  // the pin itself, in screen space so it stays a point at any distance
+  float asp = uRes.y;
+  vec2 pd = (frag - uPin) / asp;
+  float sd = length(pd);
+  float pin = exp(-sd / 0.006) * 2.6 + exp(-sd / 0.05) * (0.45 + 0.5 * uPulse);
+  pin += uFlare * (exp(-sd / 0.16) * 1.6 + exp(-abs(pd.y) / 0.003) * exp(-abs(pd.x) / 0.22) * 1.4);
+  col += fire(pin * uIntro);
+  float flood = smoothstep(0.55, 1.0, uDive);
+  col = mix(col, fire(1.05), flood * flood * exp(-sd / (0.04 + flood * flood * 3.0)));
+  col += fire(flood * 2.2 * exp(-sd / (0.02 + flood * 0.25)));
+
+  // dust in the air
+  vec2 s = frag / uRes.y;
+  for (int i = 0; i < 2; i++) {
+    float sc = i == 0 ? 20.0 : 36.0;
+    vec2 g = s * sc + vec2(uTime * 0.05, uTime * (0.10 + 0.05 * float(i)));
+    vec2 id = floor(g); vec2 f = fract(g) - 0.5;
+    vec2 o = (hash22(id + float(i) * 31.0) - 0.5) * 0.8;
+    float keep = step(0.95, hash21(id * 1.7 + 5.0));
+    col += fire(exp(-dot(f - o, f - o) * (i == 0 ? 1100.0 : 1800.0)) * keep * 0.9 * uIntro);
+  }
+
+  // keep the type column (desktop) or the lower third (phone) in darkness
+  vec2 q = frag / uRes;
+  col *= mix(1.0, 0.28 + 0.72 * smoothstep(0.26, 0.56, q.x), uSafe.x);
+  col *= mix(1.0, 0.22 + 0.78 * smoothstep(0.36, 0.52, q.y), uSafe.y);
+  col *= uIntro * 0.9 + 0.1;
+  gl_FragColor = vec4(finish(col, frag), 1.0);
+}
+</script>
+<script src="kerala.js"></script>
+<script src="proto.js"></script>
+<script>
+(function () {
+  const { createGL, loop, countdown, smooth, clamp, scrollProgress, tier } = Proto;
+  countdown(document.getElementById("count"));
+  const stage = document.getElementById("stage"), dive = document.getElementById("dive");
+  const lockup = document.getElementById("lockup"), side = document.getElementById("side");
+  const next = document.getElementById("next"), pinlabel = document.getElementById("pinlabel");
+  requestAnimationFrame(() => stage.classList.add("in"));
+
+  // ---- map space: degrees around Thiruvananthapuram, rotated 25.5 deg so the state stands upright
+  const [lon0, lat0] = KERALA.tvm, K = Math.cos(10.5 * Math.PI / 180), A = 25.5 * Math.PI / 180;
+  const toMap = ([lon, lat]) => { const x = (lon - lon0) * K, y = lat - lat0; return [x * Math.cos(A) + y * Math.sin(A), -x * Math.sin(A) + y * Math.cos(A)]; };
+  const ring = KERALA.ring.map(toMap);
+  const inside = (px, py) => { let c = false; for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) { const [xi, yi] = ring[i], [xj, yj] = ring[j]; if ((yi > py) !== (yj > py) && px < ((xj - xi) * (py - yi)) / (yj - yi) + xi) c = !c; } return c; };
+
+  // ---- mask texture: R = land, G = land blurred inward (drives the bevel and the coast light)
+  const MW = tier === "high" ? 1024 : 512, MH = MW * 2, BL = MW / 512;
+  const cx = x => ((x + 0.9) / 2.75) * MW, cy = y => (1 - (y + 0.6) / 5.5) * MH;
+  function path(ctx, sx, sy, ox = 0, oy = 0) { ctx.beginPath(); ring.forEach(([x, y], i) => ctx[i ? "lineTo" : "moveTo"](cx(x) * sx + ox, cy(y) * sy + oy)); ctx.closePath(); }
+  const mask = document.createElement("canvas"); mask.width = MW; mask.height = MH;
+  const mc = mask.getContext("2d");
+  mc.fillStyle = "#000"; mc.fillRect(0, 0, MW, MH);
+  mc.globalCompositeOperation = "lighter";
+  const N = 28;
+  for (let i = 0; i < N; i++) {                     // green channel: the outline averaged over a disc = soft edge
+    const a = (i / N) * Math.PI * 2, r = (i % 2 ? 9 : 4.5) * BL;
+    mc.fillStyle = `rgb(0 ${Math.ceil(255 / N)} 0)`; path(mc, 1, 1, Math.cos(a) * r, Math.sin(a) * r); mc.fill();
+  }
+  mc.fillStyle = "rgb(255 0 0)"; path(mc, 1, 1); mc.fill();
+
+  // ---- trails: abstract light converging on the pin. Start points are random inside the outline, nothing more.
+  const TW = tier === "high" ? 512 : 256, TH = TW * 2, TS = TW / 256, trail = document.createElement("canvas"); trail.width = TW; trail.height = TH;
+  const tc = trail.getContext("2d"); tc.fillStyle = "#000"; tc.fillRect(0, 0, TW, TH);
+  const tx = x => ((x + 0.9) / 2.75) * TW, ty = y => (1 - (y + 0.6) / 5.5) * TH;
+  const COUNT = tier === "high" ? 84 : 44;
+  let pulse = 0;
+  function spawn(p, warm) {
+    let x, y, n = 0;
+    do { x = -0.3 + Math.random() * 1.6; y = -0.3 + Math.random() * 5.0; n++; } while (!inside(x, y) && n < 60);
+    const len = Math.hypot(x, y), bend = (Math.random() - 0.5) * 0.5 * len;
+    p.sx = x; p.sy = y; p.len = len;
+    p.cx = x * 0.5 + (-y / (len || 1)) * bend; p.cy = y * 0.5 + (x / (len || 1)) * bend;
+    p.u = warm ? Math.random() : 0; p.speed = 0.10 + Math.random() * 0.10; p.px = null;
+    return p;
+  }
+  const parts = Array.from({ length: COUNT }, () => spawn({}, true));
+  function stepTrails(dt) {
+    tc.globalCompositeOperation = "source-over";
+    tc.fillStyle = `rgba(0,0,0,${1 - Math.exp(-dt * 2.6)})`; tc.fillRect(0, 0, TW, TH);
+    tc.globalCompositeOperation = "lighter"; tc.lineCap = "round";
+    for (const p of parts) {
+      p.u += dt * p.speed * (0.35 + 1.9 * p.u) / (0.35 + p.len * 0.22);
+      const u = Math.min(p.u, 1), v = 1 - u;
+      const x = v * v * p.sx + 2 * v * u * p.cx, y = v * v * p.sy + 2 * v * u * p.cy;
+      if (p.px !== null) {
+        tc.strokeStyle = `rgba(255,255,255,${Math.min(1, u * 5) * 0.85})`; tc.lineWidth = (1.0 + u * 0.8) * TS;
+        tc.beginPath(); tc.moveTo(tx(p.px), ty(p.py)); tc.lineTo(tx(x), ty(y)); tc.stroke();
+      }
+      p.px = x; p.py = y;
+      if (p.u >= 1) { pulse = Math.min(1.4, pulse + 0.5); spawn(p, false); }
+    }
+  }
+  for (let i = 0; i < 150; i++) stepTrails(1 / 30);     // arrive already streaming
+
+  // ---- camera (same maths as the shader, so the DOM can follow the pin)
+  const V = { sub: (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]], dot: (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2], cross: (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]], norm: a => { const l = Math.hypot(...a); return [a[0] / l, a[1] / l, a[2] / l]; }, mix: (a, b, t) => a.map((v, i) => v + (b[i] - v) * t) };
+  const F = 1.55;
+  function camera(e, t) {
+    const phone = innerWidth < 760;
+    const ro0 = phone ? [0.95, -4.4, 4.0] : [1.05, -1.75, 1.22], ta0 = phone ? [0.42, 1.9, 0] : [0.42, 1.35, 0];
+    const drift = [Math.sin(t * 0.11) * 0.05, Math.cos(t * 0.09) * 0.04, Math.sin(t * 0.07) * 0.02];
+    const ro = V.mix(ro0.map((v, i) => v + drift[i] * (1 - e)), [0.0, -0.07, 0.085], e);
+    const ta = V.mix(ta0, [0, 0, 0.035], Math.min(1, e * 1.25));
+    const shift = phone ? [0.04, 0.35] : [0.30 * (innerWidth / innerHeight) / 1.6, -0.02];
+    return { ro, ta, shift };
+  }
+  function project(P, cam) {
+    const fw = V.norm(V.sub(cam.ta, cam.ro)), rt = V.norm(V.cross(fw, [0, 0, 1])), up = V.cross(rt, fw);
+    const v = V.sub(P, cam.ro), z = V.dot(v, fw);
+    return [((V.dot(v, rt) / z) * F + cam.shift[0]) * innerHeight + innerWidth / 2, innerHeight / 2 - ((V.dot(v, up) / z) * F + cam.shift[1]) * innerHeight];
+  }
+
+  const canvas = document.getElementById("gl");
+  const api = createGL(canvas, document.getElementById("fs").textContent, ["uMask", "uTrail", "uRo", "uTa", "uShift", "uPin", "uSafe", "uF", "uIntro", "uPulse", "uDive", "uFlare"]);
+  let trailTex;
+  if (api) {
+    api.texture(0, mask); trailTex = api.texture(1, trail);
+    api.gl.uniform1i(api.U.uMask, 0); api.gl.uniform1i(api.U.uTrail, 1); api.gl.uniform1f(api.U.uF, F);
+  } else canvas.remove();
+
+  let diveS = 0;
+  loop(api, (t, dt) => {
+    const p = scrollProgress(dive);
+    const target = smooth(0.04, 0.84, p);
+    diveS += (target - diveS) * (dt ? 1 - Math.exp(-dt * 7) : 1);
+    const e = diveS * diveS * (3 - 2 * diveS);
+    const cam = camera(e, t);
+    const pin = project([0, 0, 0.035], cam);
+
+    // DOM follows the scroll
+    const out = smooth(0.02, 0.22, p);
+    lockup.style.opacity = side.style.opacity = 1 - out;
+    stage.classList.toggle("diving", p > 0.3);
+    lockup.style.pointerEvents = out > 0.5 ? "none" : "";
+    pinlabel.style.transform = `translate(${pin[0]}px, ${pin[1] - 16}px)`;
+    pinlabel.style.visibility = out > 0.02 ? "hidden" : "";
+    const open = smooth(0.80, 1.0, p);
+    next.style.visibility = open > 0 ? "visible" : "hidden";
+    next.style.clipPath = `circle(${open * open * Math.hypot(innerWidth, innerHeight) * 1.05}px at ${pin[0]}px ${pin[1]}px)`;
+    next.classList.toggle("in", p > 0.9);
+
+    if (!api || open >= 1) return;
+    if (dt) { stepTrails(dt); pulse *= Math.exp(-dt * 3.2); trailTex.update(trail); }
+    const g = api.gl, U = api.U, s = api.scale;
+    const phone = innerWidth < 760;
+    const intro = tier === "still" ? 1 : smooth(0.0, 1.2, t);
+    const flare = tier === "still" ? 0 : Math.exp(-Math.pow((t - 1.15) / 0.22, 2)) + 0.25 * Math.exp(-Math.max(t - 1.15, 0) / 0.6) * (t > 1.15 ? 1 : 0);
+    g.uniform3fv(U.uRo, cam.ro); g.uniform3fv(U.uTa, cam.ta); g.uniform2fv(U.uShift, cam.shift);
+    g.uniform2f(U.uPin, pin[0] * s, (innerHeight - pin[1]) * s);
+    g.uniform2f(U.uSafe, phone ? 0 : 1 - out, phone ? 1 - out : 0);
+    g.uniform1f(U.uIntro, intro); g.uniform1f(U.uPulse, pulse); g.uniform1f(U.uDive, e); g.uniform1f(U.uFlare, flare);
+    api.draw(t);
+  });
+})();
+</script>
+</body>
+</html>

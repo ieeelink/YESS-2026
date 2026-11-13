@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>{{EVENT_NAME}} · {{EVENT_FULL_NAME}} · {{DATE_DAY_MONTH}} {{DATE_YEAR}}</title>
+<meta name="description" content="{{EVENT_NAME}}, the {{EVENT_FULL_NAME}}. {{DATE_DAY_MONTH}} {{DATE_YEAR}}, {{VENUE_NAME}}, {{VENUE_CITY}}. {{ORGANIZED_BY}}.">
+<meta name="theme-color" content="#030705">
+<meta name="color-scheme" content="dark">
+<meta property="og:type" content="website">
+<meta property="og:title" content="{{EVENT_NAME}} · {{DATE_DAY_MONTH}} {{DATE_YEAR}}">
+<meta property="og:description" content="{{EVENT_FULL_NAME}}. One day at {{VENUE_NAME}}, {{VENUE_CITY}}.">
+<meta name="twitter:card" content="summary_large_image">
+{{SITE_META}}
+<!-- Temporary favicon: the supplied loading mark, used as-is until a proper icon set arrives. -->
+<link rel="icon" type="image/png" href="./assets/yess-loading-mark.png">
+<link rel="preload" as="font" type="font/woff2" crossorigin href="./assets/fonts/big-shoulders-display-latin-wght-normal.woff2">
+<link rel="preload" as="font" type="font/woff2" crossorigin href="./assets/fonts/hanken-grotesk-latin-wght-normal.woff2">
+<script type="module" src="/src/main.ts"></script>
+</head>
+<body class="locked">
+<a class="skip" href="#about">Skip to content</a>
+<div class="progress" aria-hidden="true"><i id="progress"></i></div>
+
+<header class="site-nav" id="nav">
+  <a class="site-nav__mark" href="#summit">{{EVENT_NAME}}</a>
+  <nav class="site-nav__links" aria-label="Sections">
+    <a href="#summit">Summit</a><a href="#highlights">Highlights</a><a href="#programme">Programme</a><a href="#venue">Venue</a><a href="#partners">Partners</a><a href="#faq">FAQ</a>
+  </nav>
+  <button class="site-nav__menu" id="menuBtn" type="button" aria-expanded="false" aria-controls="menu">Menu</button>
+</header>
+<div class="menu" id="menu" hidden>
+  <nav aria-label="Sections, full list">
+    <a href="#summit">Summit</a><a href="#highlights">Highlights</a><a href="#programme">Programme</a><a href="#venue">Venue</a><a href="#partners">Partners</a><a href="#faq">FAQ</a>
+  </nav>
+</div>
+
+<main>
+  <!-- 1. The arch. A tall wrapper: scrolling it opens the doors and carries the camera through them. -->
+  <section class="hero" id="summit" data-nav="summit" aria-label="{{EVENT_NAME}}">
+    <div class="stage" id="stage">
+      <div class="stage__still" aria-hidden="true"></div>
+      <canvas id="gl" aria-hidden="true"></canvas>
+      <div class="cut" id="cut" aria-hidden="true"></div>
+      <div class="bar bar--t" aria-hidden="true"></div>
+      <div class="bar bar--b" aria-hidden="true"></div>
+
+      <div class="card c1" aria-hidden="true"><p><span><b>One</b></span> <span><b>day</b></span></p></div>
+      <div class="card c2" aria-hidden="true"><p>{{DATE_DAY_MONTH}}</p></div>
+      <div class="card c3" aria-hidden="true"><p>{{VENUE_CITY}}</p></div>
+
+      <div class="lockup" id="lockup">
+        <h1 class="sr-only">{{EVENT_NAME}}, {{EVENT_FULL_NAME}}</h1>
+        <div class="lockup__logo"><img class="logo" src="./assets/YESS_Logo.svg" width="1202" height="463" alt="IEEE YESS, Yearly Engineering Students Summit 2026"></div>
+        <p class="date rv" style="--i:0"><span>{{DATE_DAY_MONTH}} {{DATE_YEAR}}</span></p>
+        <dl class="facts fade" style="--i:3">
+          <div><dt>When</dt><dd>{{HOURS_LABEL}}</dd></div>
+          <div><dt>Where</dt><dd>{{VENUE_NAME}}, {{VENUE_CITY}}</dd></div>
+        </dl>
+        <div class="actions fade" style="--i:6">
+          {{CTA_HERO}}
+          <a class="link link--down" href="#about">Explore the summit</a>
+        </div>
+        <p class="credit fade" style="--i:8">{{ORGANIZED_BY}}</p>
+      </div>
+
+      <!-- The countdown is written on the doors it counts down to; script keeps it pinned to them. -->
+      <div class="doors" id="doors"><div class="doors__in fade" style="--d:700ms">
+        <p class="doors__label" id="doorsLabel">Doors open in</p>
+        <div class="count" id="count" role="timer" aria-labelledby="doorsLabel">
+          <div><b data-cd="d">--</b><span>days</span></div>
+          <div><b data-cd="h">--</b><span>hrs</span></div>
+          <div><b data-cd="m">--</b><span>min</span></div>
+          <div><b data-cd="s">--</b><span>sec</span></div>
+        </div>
+      </div></div>
+
+      <p class="hint fade" style="--d:1500ms" aria-hidden="true">Scroll to open the doors</p>
+
+      <div class="ctl">
+        <button id="skip" type="button"><span id="skipLabel">Skip intro</span><i aria-hidden="true"></i></button>
+        <button id="snd" type="button" aria-pressed="false">Sound <b>off</b></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. Through the doors: what YESS is. -->
+  <section class="about" id="about" data-nav="summit" aria-labelledby="aboutTitle">
+    <div class="about__stage" id="aboutStage">
+      <div class="wrap about__in">
+        <p class="eyebrow rv"><span>{{KICKER}}</span></p>
+        <h2 class="about__statement" id="aboutTitle" data-split>{{ABOUT}}</h2>
+        <dl class="about__facts fade" style="--d:500ms">
+          <div><dt>Date</dt><dd>{{DATE_DAY_MONTH}} {{DATE_YEAR}}</dd></div>
+          <div><dt>Venue</dt><dd>{{VENUE_NAME}}</dd></div>
+          <div><dt>Organizers</dt><dd>IEEE LINK, IEEE Kerala Section</dd></div>
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. The hall of moments. -->
+  <section class="sec gallery" id="highlights" data-nav="highlights" aria-labelledby="hlTitle">
+    <div class="wrap gallery__head">
+      <div>
+        <p class="eyebrow rv"><span>YESS 2025 · The moments we made</span></p>
+        <h2 class="title rv" id="hlTitle" style="--i:1"><span>Highlights of YESS 25</span></h2>
+      </div>
+      <p class="lede fade" style="--i:3">A look back at the people, ideas and moments that brought us together.</p>
+    </div>
+    <div class="strip" id="strip" tabindex="0" role="region" aria-label="Photographs from YESS 2025. Drag, scroll or use the arrow keys.">
+      <ul class="strip__track">
+        {{HIGHLIGHTS}}
+      </ul>
+    </div>
+    <div class="wrap gallery__foot">
+      <p class="counter" aria-live="polite"><b id="hlNow">01</b><span> / {{HIGHLIGHTS_COUNT}}</span></p>
+      <div class="gallery__nav">
+        <button class="btn btn--line btn--sq" id="hlPrev" type="button" aria-label="Previous photograph">←</button>
+        <button class="btn btn--line btn--sq" id="hlNext" type="button" aria-label="Next photograph">→</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. The day. -->
+  <section class="sec programme" id="programme" data-nav="programme" aria-labelledby="prTitle">
+    <div class="wrap">
+      <div class="programme__head">
+        <p class="eyebrow rv"><span>{{DATE_DAY_MONTH}} {{DATE_YEAR}}</span></p>
+        <h2 class="title rv" id="prTitle" style="--i:1"><span>The day, hour by hour</span></h2>
+      </div>
+      {{PROGRAMME}}
+    </div>
+  </section>
+
+  <!-- 5. Where the doors are. -->
+  <section class="sec venue" id="venue" data-nav="venue" aria-labelledby="vnTitle">
+    <div class="wrap venue__grid">
+      <div class="venue__text">
+        <p class="eyebrow rv"><span>The venue · {{VENUE_CITY}}</span></p>
+        <h2 class="venue__name" id="vnTitle" data-split>{{VENUE_NAME}}</h2>
+        <a class="btn fade" style="--d:400ms" href="{{DIRECTIONS_URL}}" target="_blank" rel="noopener">Get directions</a>
+      </div>
+      <div class="venue__arch fade" style="--d:200ms">
+        <img src="./assets/host/host-campus-1024.webp" width="1024" height="768" loading="lazy" decoding="async" alt="The main building of Mar Baselios College of Engineering and Technology, with a statue of Christ above the entrance arch.">
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. Who stands behind it. -->
+  <section class="sec partners" id="partners" data-nav="partners" aria-labelledby="ptTitle">
+    <div class="wrap">
+      <p class="eyebrow rv"><span>Organizers</span></p>
+      <h2 class="title rv" id="ptTitle" style="--i:1"><span>Partners and sponsors</span></h2>
+      <ul class="orgs fade" style="--d:300ms">
+        <li><a class="tile tile--org" href="{{LINK_IEEE}}" target="_blank" rel="noopener"><img src="./assets/partners/ieee.png" width="1192" height="348" style="width:220px" alt="IEEE" loading="lazy"></a></li>
+        <li><a class="tile tile--org" href="{{LINK_KERALA}}" target="_blank" rel="noopener"><img src="./assets/partners/ieee-kerala-section.png" width="216" height="53" style="width:108px" alt="IEEE Kerala Section" loading="lazy"></a></li>
+        <li><a class="tile tile--org" href="{{LINK_LINK}}" target="_blank" rel="noopener"><img src="./assets/partners/ieee-link.png" width="314" height="76" style="width:157px" alt="IEEE LINK, Local Integrated Network of Kerala IEEE Students" loading="lazy"></a></li>
+      </ul>
+      <div class="tiers">
+        {{SPONSORS}}
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. Questions. -->
+  <section class="sec faq" id="faq" data-nav="faq" aria-labelledby="fqTitle">
+    <div class="wrap faq__grid">
+      <div class="faq__head">
+        <p class="eyebrow rv"><span>Before you come</span></p>
+        <h2 class="title rv" id="fqTitle" style="--i:1"><span>Questions, answered</span></h2>
+      </div>
+      <div class="faq__list">
+        {{FAQ}}
+      </div>
+    </div>
+  </section>
+
+  <!-- 8. The final call. -->
+  <section class="sec final" id="register" aria-labelledby="fnTitle">
+    <div class="final__bg" aria-hidden="true"></div>
+    <div class="wrap final__in">
+      <p class="eyebrow rv" id="finalLabel"><span>Doors open in</span></p>
+      <div class="count count--xl fade" id="countFinal" role="timer" aria-labelledby="finalLabel" style="--d:150ms">
+        <div><b data-cd="d">--</b><span>days</span></div>
+        <div><b data-cd="h">--</b><span>hrs</span></div>
+        <div><b data-cd="m">--</b><span>min</span></div>
+        <div><b data-cd="s">--</b><span>sec</span></div>
+      </div>
+      <h2 class="final__line rv" id="fnTitle" style="--i:3"><span><b>{{DATE_DAY_MONTH}} {{DATE_YEAR}}</b> <i>·</i> <b>{{VENUE_CITY}}</b></span></h2>
+      <p class="final__venue fade" style="--d:450ms">{{VENUE_NAME}}</p>
+      <div class="actions actions--c fade" style="--d:550ms">{{CTA_FINAL}}</div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot" id="notify">
+  <div class="wrap">
+    <div class="foot__top">
+      <div class="foot__brand">
+        <img class="foot__logo" src="./assets/YESS_Logo.svg" width="1202" height="463" alt="IEEE YESS, Yearly Engineering Students Summit 2026" loading="lazy">
+      </div>
+      <nav class="foot__col" aria-label="Sections">
+        <h2>Sections</h2>
+        <ul class="foot__list">
+          <li><a class="link" href="#summit">Summit</a></li><li><a class="link" href="#highlights">Highlights</a></li><li><a class="link" href="#programme">Programme</a></li>
+          <li><a class="link" href="#venue">Venue</a></li><li><a class="link" href="#partners">Partners</a></li><li><a class="link" href="#faq">FAQ</a></li>
+        </ul>
+      </nav>
+      <div class="foot__col">
+        <h2>Organizers</h2>
+        <ul class="foot__list">
+          <li><a class="link" href="{{LINK_IEEE}}" target="_blank" rel="noopener">IEEE</a></li>
+          <li><a class="link" href="{{LINK_KERALA}}" target="_blank" rel="noopener">IEEE Kerala Section</a></li>
+          <li><a class="link" href="{{LINK_LINK}}" target="_blank" rel="noopener">IEEE LINK</a></li>
+        </ul>
+        {{SOCIALS}}
+      </div>
+      <div class="foot__col foot__notify">
+        <h2>Still have questions?</h2>
+        {{NOTIFY}}
+      </div>
+    </div>
+    <p class="foot__mark" aria-hidden="true">IEEE YESS</p>
+    <p class="foot__legal">© 2026 IEEE YESS. Organized by IEEE LINK TEAM</p>
+  </div>
+</footer>
+</body>
+</html>

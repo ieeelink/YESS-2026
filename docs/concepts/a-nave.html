@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Concept A · The Nave</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+  /* centre axis: a title card standing in the hall */
+  .lockup {
+    position: absolute; left: 50%; top: 52%; transform: translate(-50%, -50%);
+    display: grid; justify-items: center; text-align: center; width: min(92vw, 760px);
+  }
+  .lockup .logo { margin-bottom: 40px; width: clamp(220px, 25vw, 380px); }
+  .lockup .label { margin-bottom: 14px; }
+  .lockup .date { margin-bottom: 24px; font-size: clamp(47px, 6.6vw, 108px); white-space: nowrap; }
+  .lockup .date span { color: var(--white); }
+  .lockup .facts { margin-bottom: 36px; }
+  .lockup .actions { justify-content: center; }
+
+  .count { position: absolute; right: var(--margin); bottom: 36px; }
+  .count b { font-size: clamp(28px, 2.6vw, 40px); }
+  .count__head { position: absolute; right: var(--margin); bottom: 96px; }
+  .facts i, .go b { font-style: normal; font-weight: inherit; }
+
+  @media (max-width: 760px) {
+    .lockup { top: 47%; }
+    .lockup .logo { margin-bottom: 26px; }
+    .lockup .facts { margin-bottom: 22px; }
+    .facts i, .go b { display: none; }
+    .count { right: auto; left: 50%; transform: translateX(-50%); bottom: 26px; gap: 20px; }
+    .count__head { display: none; }
+  }
+  .go b { font-weight: inherit; }
+</style>
+</head>
+<body>
+<canvas id="gl"></canvas>
+
+<header class="nav">
+  <div class="nav__mark label"><i></i><span>19 · 12 · 2026</span><span>Thiruvananthapuram</span></div>
+  <nav class="nav__links"><a>Summit</a><a>Highlights</a><a>Venue</a><a>Programme</a><a>Partners</a><a>FAQ</a></nav>
+  <div class="nav__end label">Menu</div>
+</header>
+
+<main class="hero">
+  <div class="lockup">
+    <img class="logo" src="../../assets/YESS_Logo.svg" alt="IEEE YESS, Yearly Engineering Students Summit 2026">
+    <p class="label">One day · 9:00 AM to 5:00 PM IST</p>
+    <p class="date">19 December <span>2026</span></p>
+    <p class="facts">
+      <b>Mar Baselios College of Engineering and Technology (Autonomous)</b>
+      <span>Thiruvananthapuram<i> · Organized by IEEE LINK, IEEE Kerala Section</i></span>
+    </p>
+    <div class="actions">
+      <span class="state"><i></i>Registration opens soon<em>Get notified</em></span>
+      <a class="go"><span>Explore<b> the summit</b></span>
+        <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 3v12M4 10l5 5 5-5"/></svg>
+      </a>
+    </div>
+  </div>
+
+  <p class="count__head label">Doors open in</p>
+  <div class="count">
+    <div><b>37</b><span class="label">Days</span></div>
+    <div><b>11</b><span class="label">Hrs</span></div>
+    <div><b>04</b><span class="label">Min</span></div>
+    <div><b>52</b><span class="label">Sec</span></div>
+  </div>
+  <div class="cue label"><i></i>Walk in</div>
+</main>
+
+<script id="fs" type="x-shader/x-fragment">
+const float BAY = 5.0;          // pier spacing
+const float PX = 3.9;           // pier line
+const float WALL = 7.4;         // outer aisle wall, where the openings are
+const vec3 LDIR = vec3(-0.74, -0.62, 0.26);   // direction the light travels (from the right, down, slightly away)
+
+float sdBox(vec3 p, vec3 b){ vec3 q = abs(p) - b; return length(max(q, 0.0)) + min(max(q.x, max(q.y, q.z)), 0.0); }
+float cellZ(float z){ return mod(z, BAY) - BAY * 0.5; }
+
+// positive in open air, negative in stone
+float naveAir(vec3 p){
+  float y = max(p.y - 8.5, 0.0);
+  return min(6.3 - length(vec2(p.x - 2.4, y)), 6.3 - length(vec2(p.x + 2.4, y)));   // two arcs = pointed vault
+}
+float map(vec3 p){
+  float nave = naveAir(p);
+  float aisle = min(WALL - abs(p.x), 7.6 - p.y);
+  float air = max(nave, aisle);
+  float d = min(p.y, air);
+  vec3 q = vec3(abs(p.x) - PX, p.y, cellZ(p.z));
+  float pier = sdBox(q, vec3(0.62, 30.0, 0.62)) - 0.03;
+  pier = min(pier, sdBox(q - vec3(0.0, 0.3, 0.0), vec3(0.86, 0.3, 0.86)));
+  pier = min(pier, sdBox(q - vec3(0.0, 7.3, 0.0), vec3(0.78, 0.16, 0.78)));
+  d = min(d, pier);
+  float rib = max(nave - 0.34, abs(q.z) - 0.24);      // transverse ribs carrying the vault
+  d = min(d, max(rib, 7.0 - p.y));
+  return d;
+}
+vec3 normal(vec3 p){
+  vec2 e = vec2(0.004, 0.0);
+  return normalize(vec3(map(p + e.xyy) - map(p - e.xyy), map(p + e.yxy) - map(p - e.yxy), map(p + e.yyx) - map(p - e.yyx)));
+}
+// analytic sunlight: openings in the right-hand wall between piers, piers and the arcade cast the shadows
+float sun(vec3 P){
+  float s = (P.x - WALL) / LDIR.x; vec3 Q = P - LDIR * s;
+  float w = smoothstep(0.85, 0.62, abs(mod(Q.z + BAY * 0.5, BAY) - BAY * 0.5));   // tall slot centred between piers
+  w *= smoothstep(1.6, 2.0, Q.y) * smoothstep(7.2, 6.8, Q.y);
+  if (P.x < PX - 0.6) {
+    float s2 = (P.x - PX) / LDIR.x; vec3 Q2 = P - LDIR * s2;
+    w *= smoothstep(0.62, 0.86, abs(cellZ(Q2.z)));
+    w *= smoothstep(7.5, 7.1, Q2.y);
+  }
+  return w;
+}
+// cut traces on the pier faces
+float runes(vec3 p){
+  float u = (abs(cellZ(p.z)) > 0.6 ? p.x : p.z) * 5.0;
+  float v = p.y * 0.9;
+  vec2 id = vec2(floor(u), floor(v));
+  float on = step(0.5, hash21(id + floor(p.z / BAY) * 7.0));
+  float line = smoothstep(0.09, 0.02, abs(fract(u) - 0.5)) * on;
+  float node = smoothstep(0.24, 0.16, length(vec2(fract(u) - 0.5, (fract(v) - 0.06) * 3.0))) * on;
+  float jog = smoothstep(0.05, 0.01, abs(fract(v) - 0.06)) * step(0.72, hash21(id + 3.0));
+  return max(max(line, node), jog * 0.8);
+}
+
+void main(){
+  vec2 frag = gl_FragCoord.xy;
+  vec2 uv = (frag - 0.5 * uRes) / uRes.y;
+  float portrait = step(uRes.x, uRes.y);
+  vec3 ro = vec3(-0.35, 1.75, 0.1);
+  vec3 fw = normalize(vec3(0.05, 0.30, 1.0));
+  vec3 rt = vec3(1.0, 0.0, 0.0);
+  vec3 up = cross(fw, rt);
+  vec3 rd = normalize(fw * mix(0.86, 0.60, portrait) + rt * uv.x + up * uv.y);
+
+  float t = 0.0; float hit = 0.0;
+  for (int i = 0; i < 140; i++) {
+    float d = map(ro + rd * t);
+    if (d < 0.0015 * t) { hit = 1.0; break; }
+    t += d * 0.9;
+    if (t > 140.0) break;
+  }
+  t = min(t, 140.0);
+  vec3 p = ro + rd * t;
+  vec3 col = vec3(0.0);
+  if (hit > 0.5) {
+    vec3 n = normal(p);
+    float lit = sun(p + n * 0.02) * max(dot(n, -LDIR), 0.0);
+    float isPier = step(abs(abs(p.x) - PX), 0.7) * step(0.62, p.y) * step(p.y, 7.1);
+    float stone = 0.55 + 0.45 * fbm(p.xz * 1.3 + p.y * 2.1);
+    vec3 base = vec3(0.016, 0.022, 0.019) * stone;
+    float sky = 0.5 + 0.5 * n.y;
+    col = base * (0.30 + 0.5 * sky) + base * FOREST * 7.0 * (0.3 + 0.7 * max(n.x, 0.0));    // bounce from the lit side
+    col += fire(lit * 1.25) * (0.55 + 0.45 * stone);
+    // joints in the floor slabs
+    if (p.y < 0.01) {
+      vec2 g = abs(fract(p.xz / vec2(1.3, 2.5)) - 0.5);
+      col *= 0.55 + 0.45 * smoothstep(0.0, 0.03, min(g.x, g.y));
+    }
+    float r = runes(p) * isPier * (1.0 - abs(n.y));
+    float wake = exp(-max(t - 6.0, 0.0) / 16.0);
+    col += SIGNAL * r * (0.012 + 0.4 * lit) * wake;
+  }
+  float fog = 1.0 - exp(-t * 0.020);
+  vec3 fogCol = vec3(0.004, 0.013, 0.009) + FOREST * (0.16 + 0.34 * smoothstep(0.05, 0.6, rd.y)) * smoothstep(-0.9, 0.4, rd.x);
+  col = mix(col, fogCol, fog);
+
+  // light hanging in the air
+  float acc = 0.0; float dt = min(t, 95.0) / 56.0; float tt = dt * hash21(frag);
+  for (int i = 0; i < 56; i++) {
+    vec3 q = ro + rd * tt;
+    float dens = 0.35 + 0.9 * fbm3(q.xz * 0.22 + vec2(q.y * 0.5, 0.0));
+    acc += sun(q) * dens * dt * exp(-tt * 0.016);
+    tt += dt;
+  }
+  col += fire(acc * 0.20);
+
+  // embers drifting through the shafts
+  vec2 s = frag / uRes.y;
+  for (int i = 0; i < 2; i++) {
+    float sc = i == 0 ? 22.0 : 40.0;
+    vec2 g = s * sc; vec2 id = floor(g); vec2 f = fract(g) - 0.5;
+    vec2 o = (hash22(id + float(i) * 31.0) - 0.5) * 0.8;
+    float keep = step(0.94, hash21(id * 1.7 + 5.0));
+    col += fire(exp(-dot(f - o, f - o) * (i == 0 ? 1100.0 : 1800.0)) * keep * (0.3 + acc * 0.08) * 2.0);
+  }
+
+  // quiet the centre axis a touch so the lockup sits in darkness
+  vec2 c = (frag / uRes - vec2(0.5, 0.48)) * vec2(1.0, 1.25);
+  col *= 1.0 - 0.45 * exp(-dot(c, c) / 0.06);
+
+  gl_FragColor = vec4(finish(col, frag), 1.0);
+}
+</script>
+<script src="gl.js"></script>
+</body>
+</html>
