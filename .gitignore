@@ -11,8 +11,6 @@
 .agents/
 skills-lock.json
 
-# Markdown
-*.md
-
-# Local archives
+# Local archives and deps
 *.zip
+node_modules/
