@@ -42,6 +42,8 @@ function contentTokens(): Plugin {
           LINK_IEEE: esc(CONFIG.LINKS.ieee),
           LINK_KERALA: esc(CONFIG.LINKS.ieeeKerala),
           LINK_LINK: esc(CONFIG.LINKS.ieeeLink),
+          LINK_YESS25: esc(CONFIG.LINKS.yess25),
+          WORDMARK: [..."IEEE YESS"].map((c, i) => `<span class="ch" style="--i:${i}">${c === " " ? "&nbsp;" : c}</span>`).join(""),
           DIRECTIONS_URL: directions(),
           CTA: cta(),
           HIGHLIGHTS: highlights(),

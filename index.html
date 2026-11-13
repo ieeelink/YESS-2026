@@ -187,37 +187,35 @@
 </main>
 
 <footer class="foot" id="notify">
-  <div class="wrap">
+  <div class="foot__smoke" aria-hidden="true"></div>
+  <div class="wrap foot__in">
     <div class="foot__top">
-      <div class="foot__brand">
-        <img class="logo foot__logo" src="./assets/YESS_Logo.svg" width="1202" height="463" alt="IEEE YESS, Yearly Engineering Students Summit 2026" loading="lazy">
-      </div>
-      <div class="foot__notify">
-        <h2 class="foot__h">Get notified</h2>
+      <img class="logo foot__logo" src="./assets/YESS_Logo.svg" width="1202" height="463" alt="IEEE YESS, Yearly Engineering Students Summit 2026" loading="lazy" decoding="async">
+      <div class="foot__ask">
+        <h2 class="foot__q">Still have questions?</h2>
+        <p class="foot__sub">Leave your email. We will reply, and let you know when registration opens.</p>
         {{NOTIFY}}
       </div>
-    </div>
-    <div class="foot__cols">
-      <nav class="foot__col" aria-label="Sections, footer">
-        <h2 class="foot__h">Sections</h2>
-        <ul class="foot__list">
-          <li><a class="link" href="#about">About</a></li><li><a class="link" href="#highlights">Highlights</a></li><li><a class="link" href="#programme">Programme</a></li>
-          <li><a class="link" href="#venue">Venue</a></li><li><a class="link" href="#partners">Partners</a></li><li><a class="link" href="#faq">FAQ</a></li>
-        </ul>
-      </nav>
-      <div class="foot__col">
-        <h2 class="foot__h">Organizers</h2>
-        <ul class="foot__list">
-          <li><a class="link" href="{{LINK_LINK}}" target="_blank" rel="noopener">IEEE LINK</a></li>
-          <li><a class="link" href="{{LINK_KERALA}}" target="_blank" rel="noopener">IEEE Kerala Section</a></li>
-          <li><a class="link" href="{{LINK_IEEE}}" target="_blank" rel="noopener">IEEE</a></li>
-        </ul>
+      <div class="foot__cols">
+        <nav aria-label="Sections, footer">
+          <ul class="foot__list">
+            <li><a class="link" href="#highlights">Highlights</a></li><li><a class="link" href="#programme">Programme</a></li><li><a class="link" href="#venue">Venue</a></li><li><a class="link" href="#partners">Partners</a></li><li><a class="link" href="#faq">FAQ</a></li>
+          </ul>
+        </nav>
+        <nav aria-label="IEEE">
+          <ul class="foot__list">
+            <li><a class="link" href="{{LINK_IEEE}}" target="_blank" rel="noopener">IEEE</a></li>
+            <li><a class="link" href="{{LINK_KERALA}}" target="_blank" rel="noopener">IEEE Kerala Section</a></li>
+            <li><a class="link" href="{{LINK_LINK}}" target="_blank" rel="noopener">IEEE LINK</a></li>
+            <li><a class="link" href="{{LINK_YESS25}}" target="_blank" rel="noopener">YESS 2025</a></li>
+          </ul>
+        </nav>
+        {{SOCIALS}}
       </div>
-      {{SOCIALS}}
     </div>
+    <p class="foot__mark" id="footMark" aria-hidden="true"><span class="foot__mark-in">{{WORDMARK}}</span></p>
     <div class="foot__legal">
-      <p>© 2026 IEEE YESS. Organized by IEEE LINK TEAM</p>
-      <a class="link" href="#top">Back to top</a>
+      <p>© 2026 IEEE YESS. Organized by <a class="link link--inline" href="{{LINK_LINK}}" target="_blank" rel="noopener">IEEE LINK</a> TEAM</p>
     </div>
   </div>
 </footer>

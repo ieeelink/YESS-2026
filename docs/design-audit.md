@@ -114,3 +114,13 @@ Screenshots after: `docs/shots/after/` (1440, 820, 390; hero also at 1280x620 an
 - No horizontal overflow at 1440 / 820 / 390 / 375; touch targets ≥ 44 px on phones; mobile menu opens, closes on link and Escape.
 - Lighthouse mobile: Performance 99, Accessibility 100, Best practices 100, SEO 100 (LCP 2.0 s, CLS 0). Desktop: 100 / 100 / 100 / 100.
 - The logo is the same `assets/YESS_Logo.svg` everywhere as a plain `<img>`; no filters, masks or overlays touch it. Organizer logos are the supplied PNGs.
+
+## Footer rebuild and button system (13 Nov, second request)
+
+- **Footer** restyled to the earlier build's shape: a #0b0b0b panel with only the top corners rounded (44 px desktop, 28 px phones), pulled up by its radius over the final call, which now fades from the page black into a #13291a tint so the curve reads. The faint smoke still from the earlier build (`src/img/smoke-*.webp`) sits at 20% opacity, masked away at the top.
+- Top row: logo on the left; "Still have questions?" with the email form on the right, top-aligned. Two link columns under the logo (current sections; IEEE, IEEE Kerala Section, IEEE LINK, YESS 2025 at yess.ieee-link.org as used by the earlier build). Thin green underline on hover and focus.
+- Form: posts to `CONFIG.NOTIFY_ENDPOINT`; without one, opens a mail to `CONFIG.CONTACT_EMAIL`; with neither, shows a visible yellow TODO note (and the build warns).
+- Wordmark "IEEE YESS" is back on request: one line, white, fitted in JS to 70% of the content width, letters rise once and end sharp.
+- Legal line centred under a hairline, "IEEE LINK" underlined as a link.
+- **Primary button** is now the two-part chamfered style everywhere (hero, final call, footer): a label block with its top-left corner cut at 45° and a separate arrow block with its bottom-right corner cut, 4 px apart; hover lightens both and nudges the arrow. Secondary stays a 1 px outline.
+- Build passes; Lighthouse mobile 99 / 100 / 100 / 100 after the change.

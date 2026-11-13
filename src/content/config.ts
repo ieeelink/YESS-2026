@@ -30,7 +30,12 @@ export const CONFIG = {
   REGISTER_URL: null as string | null,
   /** TODO: contact email. */
   CONTACT_EMAIL: null as string | null,
-  /** TODO: endpoint the "Get notified" form posts to. */
+  /**
+   * TODO: endpoint the footer form ("Still have questions?") posts to: any form service that accepts
+   * POST with an "email" field (Formspree, Getform, Basin...). If it stays null but CONTACT_EMAIL is set,
+   * the form opens the visitor's mail app addressed to CONTACT_EMAIL instead. With neither, the footer
+   * shows a visible TODO.
+   */
   NOTIFY_ENDPOINT: null as string | null,
   /** TODO: 2026 social handles (full URLs). Hidden while null. */
   SOCIALS: {
@@ -47,6 +52,8 @@ export const CONFIG = {
     ieee: "https://www.ieee.org/",
     ieeeKerala: "https://ieeekerala.org/",
     ieeeLink: "https://ieee-link.org/",
+    /** Last year's site, linked from the earlier YESS build. If the 2026 site is deployed to this same domain, change it. */
+    yess25: "https://yess.ieee-link.org/",
   },
   /**
    * The organizer marquee in the hero. Real files from assets/partners, used exactly as supplied.

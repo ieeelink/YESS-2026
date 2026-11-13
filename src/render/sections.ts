@@ -12,11 +12,15 @@ const pad = (n: number) => String(n).padStart(2, "0");
 const arrow = `<svg class="btn__icon" width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M1 7h11M7.5 2.5 12 7l-4.5 4.5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>`;
 const out = `<svg class="btn__icon" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 9 9 3M4 3h5v5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>`;
 
-/** The one primary action. "Register now" once CONFIG.REGISTER_URL is set; until then it points at the notify form. */
+/** The primary button: a chamfered label block and a separate chamfered arrow block. Used for every primary action. */
+export const primary = (label: string, icon: string = arrow) =>
+  `<span class="btn__label">${label}</span><span class="btn__arrow" aria-hidden="true">${icon}</span>`;
+
+/** The one primary action. "Register now" once CONFIG.REGISTER_URL is set; until then it points at the footer form. */
 export const cta = () =>
   CONFIG.REGISTER_URL
-    ? `<a class="btn btn--primary" href="${esc(CONFIG.REGISTER_URL)}" target="_blank" rel="noopener">Register now ${out}</a>`
-    : `<a class="btn btn--primary" href="#notify"><span class="btn__soft">Registration opens soon</span><span class="btn__dot" aria-hidden="true">·</span>Get notified ${arrow}</a>`;
+    ? `<a class="btn btn--primary" href="${esc(CONFIG.REGISTER_URL)}" target="_blank" rel="noopener">${primary("Register now", out)}<span class="sr-only"> (opens in a new tab)</span></a>`
+    : `<a class="btn btn--primary" href="#notify">${primary('<span class="btn__soft">Registration opens soon</span><span class="btn__dot" aria-hidden="true">·</span>Get notified')}</a>`;
 
 /**
  * The organizer marquee. One set of logos, repeated so each half of the track is wider than any
@@ -86,20 +90,23 @@ export function faq() {
 }
 
 /**
- * The notify form. It posts to CONFIG.NOTIFY_ENDPOINT (any form service that accepts POST with an
- * "email" field). TODO: while the endpoint is null the form stays on the page but tells the visitor
- * the list is not open yet, instead of pretending to sign them up. The build prints a warning.
+ * The footer form. Posts the email to CONFIG.NOTIFY_ENDPOINT; without one it falls back to a mail
+ * link to CONFIG.CONTACT_EMAIL; with neither it shows a visible TODO (and the build warns).
  */
 export function notify() {
-  const mail = CONFIG.CONTACT_EMAIL ? `<p class="notify__mail">Questions: <a class="link" href="mailto:${esc(CONFIG.CONTACT_EMAIL)}">${esc(CONFIG.CONTACT_EMAIL)}</a></p>` : "";
-  return `<form class="notify" id="notifyForm" method="post"${CONFIG.NOTIFY_ENDPOINT ? ` action="${esc(CONFIG.NOTIFY_ENDPOINT)}"` : ' data-off'} novalidate>
-    <label class="notify__label" for="notifyEmail">Hear first when registration opens.</label>
+  const mode = CONFIG.NOTIFY_ENDPOINT ? "post" : CONFIG.CONTACT_EMAIL ? "mail" : "off";
+  const attrs = mode === "post" ? ` action="${esc(CONFIG.NOTIFY_ENDPOINT!)}"` : mode === "mail" ? ` data-mail="${esc(CONFIG.CONTACT_EMAIL!)}"` : " data-off";
+  const todo = mode === "off"
+    ? `<p class="todo" role="note"><b>TODO</b> Connect this form: set <code>NOTIFY_ENDPOINT</code> or <code>CONTACT_EMAIL</code> in <code>src/content/config.ts</code>.</p>`
+    : "";
+  return `<form class="notify" id="notifyForm" method="post"${attrs} novalidate>
     <div class="notify__row">
-      <input id="notifyEmail" name="email" type="email" required autocomplete="email" placeholder="you@college.edu" inputmode="email">
-      <button class="btn btn--primary" type="submit">Notify me</button>
+      <label class="sr-only" for="notifyEmail">Your email</label>
+      <input id="notifyEmail" name="email" type="email" required autocomplete="email" inputmode="email" placeholder="Enter your email">
+      <button class="btn btn--primary" type="submit">${primary("Send")}</button>
     </div>
     <p class="notify__msg" id="notifyMsg" role="status" aria-live="polite"></p>
-  </form>${mail}`;
+  </form>${todo}`;
 }
 
 export function socials() {
@@ -107,7 +114,7 @@ export function socials() {
   const items = Object.entries(CONFIG.SOCIALS).filter(([, url]) => url);
   if (!items.length) return "";
   const names: Record<string, string> = { instagram: "Instagram", linkedin: "LinkedIn", youtube: "YouTube", whatsapp: "WhatsApp" };
-  return `<div class="foot__col"><h2 class="foot__h">Follow</h2><ul class="foot__list">${items.map(([k, url]) => `<li><a class="link" href="${esc(url as string)}" target="_blank" rel="noopener">${names[k] ?? k}</a></li>`).join("")}</ul></div>`;
+  return `<nav aria-label="Social"><ul class="foot__list">${items.map(([k, url]) => `<li><a class="link" href="${esc(url as string)}" target="_blank" rel="noopener">${names[k] ?? k}</a></li>`).join("")}</ul></nav>`;
 }
 
 export const directions = () => esc(directionsUrl());

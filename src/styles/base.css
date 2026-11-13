@@ -40,7 +40,9 @@
   --margin: clamp(20px, 5vw, 88px);
   --gutter: clamp(16px, 2vw, 32px);
   --max: 1600px;
-  --r: 2px; /* the only radius */
+  --r: 2px; /* the only small radius */
+  --panel-r: 44px; /* the footer panel's top corners */
+  --chamfer: 12px; --btn-h: 52px; --green-hi: #5cff9c;
 
   /* one easing family, one duration scale */
   --ease: cubic-bezier(0.16, 1, 0.3, 1);
@@ -83,15 +85,22 @@ ul, ol { list-style: none; }
 .btn:active { transform: translateY(1px); }
 .btn__icon { flex: none; transition: transform var(--t-small) var(--ease); }
 .btn:hover .btn__icon { transform: translateX(3px); }
-.btn--primary { background: var(--green); color: var(--black); }
-.btn--primary:hover { background: var(--white); }
+/* primary: a label block with its top-left corner cut at 45°, a 4px gap, and an arrow block with its
+   bottom-right corner cut. The link/button itself is transparent so focus rings and taps cover both. */
+.btn--primary { gap: 4px; padding: 0; align-items: stretch; height: var(--btn-h); min-height: 0; color: var(--black); }
+.btn--primary .btn__label, .btn--primary .btn__arrow { display: flex; align-items: center; justify-content: center; background: var(--green); transition: background-color var(--t-state) var(--ease); }
+.btn--primary .btn__label { gap: 8px; padding-inline: 22px; clip-path: polygon(var(--chamfer) 0, 100% 0, 100% 100%, 0 100%, 0 var(--chamfer)); }
+.btn--primary .btn__arrow { flex: none; width: var(--btn-h); clip-path: polygon(0 0, 100% 0, 100% calc(100% - var(--chamfer)), calc(100% - var(--chamfer)) 100%, 0 100%); }
+.btn--primary:hover .btn__label, .btn--primary:hover .btn__arrow { background: var(--green-hi); }
+.btn--primary:hover .btn__icon { transform: translateX(3px); }
+.btn--primary:focus-visible { border-radius: 0; }
 .btn--secondary { box-shadow: inset 0 0 0 1px var(--line-2); color: var(--ink); }
 .btn--secondary:hover { box-shadow: inset 0 0 0 1px var(--white); background: rgb(255 255 255 / 0.04); }
 .btn--icon { width: 48px; padding: 0; }
 .btn--icon:hover svg { transform: none; }
 .btn__soft { font-weight: 500; }
 .btn__dot { margin-inline: -2px; }
-@media (max-width: 420px) { .btn--primary .btn__soft { font-size: 14px; } .btn--primary { padding-inline: 16px; gap: 8px; } }
+@media (max-width: 420px) { .btn--primary .btn__soft { font-size: 14px; } .btn--primary .btn__label { padding-inline: 14px; gap: 6px; } }
 
 /* text links: one look */
 .link { color: var(--ink-2); background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px no-repeat; transition: color var(--t-state) var(--ease), background-size var(--t-small) var(--ease); padding-block: 2px; }
@@ -125,6 +134,7 @@ ul, ol { list-style: none; }
   .nav__menu { display: block; }
   .nav__logo { width: 84px; }
   html { scroll-padding-top: 64px; }
+  :root { --panel-r: 28px; --chamfer: 10px; --btn-h: 50px; }
 }
 
 /* ---- shared type ---- */

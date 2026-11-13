@@ -36,7 +36,7 @@ export function initNav() {
   const reveal = new IntersectionObserver(es => {
     for (const e of es) if (e.isIntersecting) { e.target.classList.add("in"); reveal.unobserve(e.target); }
   }, { rootMargin: "0px 0px -12% 0px", threshold: 0 });
-  document.querySelectorAll(".sec, .final, .foot").forEach(s => reveal.observe(s));
+  document.querySelectorAll(".sec, .final, .foot, #footMark").forEach(s => reveal.observe(s));
 
   // phone menu: full screen; Escape and any link close it
   const menu = document.getElementById("menu")!, btn = document.getElementById("menuBtn")!;

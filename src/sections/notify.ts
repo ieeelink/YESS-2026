@@ -14,14 +14,20 @@ export function initNotify() {
   form.addEventListener("submit", async e => {
     e.preventDefault();
     if (!input.checkValidity()) { say("Enter a valid email address."); input.focus(); return; }
-    if (form.hasAttribute("data-off")) { say("The list opens shortly. Please check back soon."); return; }
+    if (form.hasAttribute("data-off")) { say("This form is not connected yet."); return; }
+    if (form.dataset.mail) {
+      const body = encodeURIComponent(`Please reply to: ${input.value}\n\n`);
+      location.href = `mailto:${form.dataset.mail}?subject=${encodeURIComponent("IEEE YESS 2026: a question")}&body=${body}`;
+      say("Your mail app should open with the message ready to send.", true);
+      return;
+    }
     button.disabled = true;
     say("Sending…");
     try {
       const res = await fetch(form.action, { method: "POST", body: new FormData(form), headers: { Accept: "application/json" } });
       if (!res.ok) throw new Error(String(res.status));
       form.reset();
-      say("You are on the list. We will write when registration opens.", true);
+      say("Thank you. We will be in touch.", true);
     } catch {
       say("That did not go through. Please try again in a moment.");
     } finally {
