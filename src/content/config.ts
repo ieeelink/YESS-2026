@@ -8,18 +8,20 @@
 export const CONFIG = {
   EVENT_NAME: "IEEE YESS 2026",
   EVENT_FULL_NAME: "Yearly Engineering Students Summit",
-  KICKER: "IEEE YESS 2026 · Yearly Engineering Students Summit",
 
   /** Provisional: one day, 9:00 AM to 5:00 PM IST. The countdown runs to START. */
   START: "2026-12-19T09:00:00+05:30",
   END: "2026-12-19T17:00:00+05:30",
   DATE_DAY_MONTH: "19 December",
   DATE_YEAR: "2026",
-  HOURS_LABEL: "One day · 9:00 AM to 5:00 PM IST",
+  HOURS_LABEL: "9:00 AM – 5:00 PM IST",
 
   VENUE_NAME: "Mar Baselios College of Engineering and Technology (Autonomous)",
+  /** The hero line and the final call use the short name; the venue section sets it in two lines. */
+  VENUE_SHORT: "Mar Baselios College of Engineering and Technology",
+  VENUE_LINES: ["Mar Baselios College of", "Engineering and Technology"],
   VENUE_CITY: "Thiruvananthapuram",
-  ORGANIZED_BY: "Organized by IEEE LINK, IEEE Kerala Section",
+  ORGANIZED_BY: "Organized by IEEE LINK under the IEEE Kerala Section",
 
   ABOUT:
     "IEEE YESS is the Yearly Engineering Students Summit, an annual IEEE gathering for engineering students. It is a space to learn, connect and build alongside fellow students.",
@@ -46,6 +48,15 @@ export const CONFIG = {
     ieeeKerala: "https://ieeekerala.org/",
     ieeeLink: "https://ieee-link.org/",
   },
+  /**
+   * The organizer marquee in the hero. Real files from assets/partners, used exactly as supplied.
+   * Native sizes: ieee-kerala-section.png 216x53, ieee-link.png 314x76, ieee.png 1192x348.
+   */
+  ORGANIZERS: [
+    { name: "IEEE Kerala Section", file: "ieee-kerala-section.png", w: 216, h: 53 },
+    { name: "IEEE LINK", file: "ieee-link.png", w: 314, h: 76 },
+    { name: "IEEE", file: "ieee.png", w: 1192, h: 348 },
+  ],
 } as const;
 
 /** Directions are a Google Maps search for the venue name: no street address is confirmed. */

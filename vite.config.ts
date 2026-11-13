@@ -1,6 +1,6 @@
 import { defineConfig, type Plugin } from "vite";
 import { CONFIG } from "./src/content/config";
-import { cta, directions, esc, faq, highlights, highlightsCount, notify, programme, socials, sponsors } from "./src/render/sections";
+import { cta, directions, esc, faq, highlights, highlightsCount, marquee, notify, programme, socials, sponsors } from "./src/render/sections";
 
 /**
  * Fills {{TOKENS}} in index.html from the content files at build time, so the facts live in one
@@ -11,6 +11,13 @@ import { cta, directions, esc, faq, highlights, highlightsCount, notify, program
 function contentTokens(): Plugin {
   return {
     name: "yess-content-tokens",
+    buildStart() {
+      // Launch checklist: say out loud which facts are still missing.
+      const todo = Object.entries({ REGISTER_URL: CONFIG.REGISTER_URL, NOTIFY_ENDPOINT: CONFIG.NOTIFY_ENDPOINT, CONTACT_EMAIL: CONFIG.CONTACT_EMAIL, SITE_URL: CONFIG.SITE_URL })
+        .filter(([, v]) => !v).map(([k]) => k);
+      if (!Object.values(CONFIG.SOCIALS).some(Boolean)) todo.push("SOCIALS");
+      if (todo.length) this.warn(`CONFIG still empty (src/content/config.ts): ${todo.join(", ")}`);
+    },
     transformIndexHtml: {
       order: "pre",
       handler(html) {
@@ -21,20 +28,22 @@ function contentTokens(): Plugin {
         const map: Record<string, string> = {
           EVENT_NAME: esc(CONFIG.EVENT_NAME),
           EVENT_FULL_NAME: esc(CONFIG.EVENT_FULL_NAME),
-          KICKER: esc(CONFIG.KICKER),
           DATE_DAY_MONTH: esc(CONFIG.DATE_DAY_MONTH),
           DATE_YEAR: esc(CONFIG.DATE_YEAR),
           HOURS_LABEL: esc(CONFIG.HOURS_LABEL),
           VENUE_NAME: esc(CONFIG.VENUE_NAME),
+          VENUE_SHORT: esc(CONFIG.VENUE_SHORT),
+          VENUE_L1: esc(CONFIG.VENUE_LINES[0]),
+          VENUE_L2: esc(CONFIG.VENUE_LINES[1]),
           VENUE_CITY: esc(CONFIG.VENUE_CITY),
           ORGANIZED_BY: esc(CONFIG.ORGANIZED_BY),
+          MARQUEE: marquee(),
           ABOUT: esc(CONFIG.ABOUT),
           LINK_IEEE: esc(CONFIG.LINKS.ieee),
           LINK_KERALA: esc(CONFIG.LINKS.ieeeKerala),
           LINK_LINK: esc(CONFIG.LINKS.ieeeLink),
           DIRECTIONS_URL: directions(),
-          CTA_HERO: cta("hero"),
-          CTA_FINAL: cta("final"),
+          CTA: cta(),
           HIGHLIGHTS: highlights(),
           HIGHLIGHTS_COUNT: highlightsCount(),
           PROGRAMME: programme(),
@@ -44,7 +53,7 @@ function contentTokens(): Plugin {
           SOCIALS: socials(),
           SITE_META: meta,
         };
-        return html.replace(/\{\{([A-Z_]+)\}\}/g, (m, k: string) => (k in map ? map[k] : m));
+        return html.replace(/\{\{([A-Z0-9_]+)\}\}/g, (m, k: string) => (k in map ? map[k] : m));
       },
     },
   };
@@ -53,5 +62,5 @@ function contentTokens(): Plugin {
 export default defineConfig({
   base: "./", // works from any sub-path or subdomain; the domain is never hard-coded
   plugins: [contentTokens()],
-  build: { target: "es2019", assetsInlineLimit: 0 }, // the logo and marks always ship as files, never inlined
+  build: { target: "es2019", assetsInlineLimit: 0, chunkSizeWarningLimit: 200 }, // the logo and marks always ship as files, never inlined
 });

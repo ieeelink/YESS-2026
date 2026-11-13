@@ -11,7 +11,6 @@
  *   Answers may contain plain text only.
  * When no item is flagged any more, delete this notice.
  */
-import { CONFIG } from "./config";
 
 export interface Sponsor { name: string; logo?: string; url?: string; placeholder?: true }
 export interface SponsorTier { tier: string; size: "l" | "m" | "s"; items: Sponsor[] }
@@ -33,24 +32,20 @@ export const SPONSOR_TIERS: SponsorTier[] = [
 
 export interface Faq { q: string; a: string; placeholder?: true }
 
-const when = `${CONFIG.DATE_DAY_MONTH} ${CONFIG.DATE_YEAR}`;
-
-/** Answers use only confirmed facts (date, hours, venue, organisers) or say that details will be announced. */
+/** Answers use only confirmed facts, or say that details will be announced. Date and venue live in the hero. */
 export const FAQ: Faq[] = [
-  { placeholder: true, q: "When and where is IEEE YESS 2026?",
-    a: `${when}, at ${CONFIG.VENUE_NAME}, ${CONFIG.VENUE_CITY}. It is a single-day event, planned for 9:00 AM to 5:00 PM IST. The hours are provisional and will be confirmed here.` },
-  { placeholder: true, q: "Who organizes it?",
+  { placeholder: true, q: "Who organizes IEEE YESS 2026?",
     a: "IEEE YESS 2026 is organized by the IEEE LINK team under the IEEE Kerala Section." },
   { placeholder: true, q: "How do I register?",
-    a: "Registration is not open yet. When it opens, the Register button on this page will take you to it." },
+    a: "Registration is not open yet. When it opens, the button at the top of this page will take you straight to it. Leave your email below to hear the moment it does." },
   { placeholder: true, q: "Who can attend?",
-    a: "IEEE YESS is an annual IEEE gathering for engineering students. Who can register, and how, will be announced with registration." },
+    a: "IEEE YESS is an annual IEEE gathering for engineering students. Eligibility and how to register will be announced with registration." },
   { placeholder: true, q: "Is there a registration fee?",
     a: "Fee details will be announced when registration opens." },
   { placeholder: true, q: "What is on the programme?",
-    a: "The programme, speakers and sessions will be announced on this page. The day runs from 9:00 AM to 5:00 PM IST." },
+    a: "Sessions, speakers and tracks will be announced on this page. The day runs from 9:00 AM to 5:00 PM IST. The hours are provisional." },
   { placeholder: true, q: "How do I get to the venue?",
-    a: `The venue is ${CONFIG.VENUE_NAME}, ${CONFIG.VENUE_CITY}. Use the Get directions link in the Venue section. Travel details will be announced.` },
+    a: "Use Get directions in the Venue section to open the route in Google Maps. Travel details will be announced." },
   { placeholder: true, q: "Who do I contact with a question?",
-    a: "Contact details will be announced here." },
+    a: "Contact details will be announced here shortly." },
 ];

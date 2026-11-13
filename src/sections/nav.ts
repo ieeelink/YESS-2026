@@ -1,39 +1,53 @@
-/** Page chrome: scroll progress, the active nav link, the phone menu, and the reveal of each chamber as it is entered. */
+import { reducedMotion } from "../lib/env";
+
+/** Page chrome: the nav backing, the active link, the phone menu, section reveals and the scroll-linked light. */
 export function initNav() {
   const root = document.documentElement;
-  const bar = document.getElementById("progress")!;
-  const links = [...document.querySelectorAll<HTMLAnchorElement>(".site-nav__links a")];
-  const hero = document.getElementById("summit")!;
+  const hero = document.getElementById("top")!;
+  const world = document.querySelector<HTMLElement>(".world")!;
+  const links = [...document.querySelectorAll<HTMLAnchorElement>(".nav__links a")];
 
-  // progress + a soft backing for the nav once it sits over text
+  // one rAF-throttled scroll handler: nav backing, and two numbers the light reads (transform/opacity only)
   let ticking = false;
   const onScroll = () => {
-    if (ticking) return; ticking = true;
+    if (ticking) return;
+    ticking = true;
     requestAnimationFrame(() => {
       ticking = false;
-      const max = document.documentElement.scrollHeight - innerHeight;
-      bar.style.transform = `scaleX(${max > 0 ? Math.min(1, scrollY / max) : 0})`;
-      root.classList.toggle("nav-solid", scrollY > hero.offsetHeight - innerHeight * 0.5);
+      const y = scrollY, max = root.scrollHeight - innerHeight;
+      root.classList.toggle("nav-solid", y > hero.offsetHeight - 80);
+      if (!reducedMotion) {
+        world.style.setProperty("--sp", (max > 0 ? y / max : 0).toFixed(4));
+        hero.style.setProperty("--hp", Math.min(1, y / hero.offsetHeight).toFixed(4));
+      }
     });
   };
-  addEventListener("scroll", onScroll, { passive: true }); onScroll();
+  addEventListener("scroll", onScroll, { passive: true });
+  onScroll();
 
-  // the active link follows whichever chamber holds the middle of the screen
+  // the active link follows whichever section holds the middle of the screen
   const setActive = (id: string) => links.forEach(a => {
     if (a.getAttribute("href") === "#" + id) a.setAttribute("aria-current", "true"); else a.removeAttribute("aria-current");
   });
-  setActive("summit");
-  const spy = new IntersectionObserver(es => { for (const e of es) if (e.isIntersecting) setActive((e.target as HTMLElement).dataset.nav!); }, { rootMargin: "-50% 0px -50% 0px" });
-  document.querySelectorAll<HTMLElement>("[data-nav]").forEach(s => spy.observe(s));
+  const spy = new IntersectionObserver(es => { for (const e of es) if (e.isIntersecting) setActive(e.target.id); }, { rootMargin: "-50% 0px -50% 0px" });
+  document.querySelectorAll<HTMLElement>("main > section[id]").forEach(s => spy.observe(s));
 
-  // each chamber reveals once, when a fifth of it is on screen
-  const reveal = new IntersectionObserver(es => { for (const e of es) if (e.isIntersecting) { e.target.classList.add("in"); reveal.unobserve(e.target); } }, { threshold: 0.2 });
-  document.querySelectorAll(".sec, .foot").forEach(s => reveal.observe(s));
+  // each section reveals once, as it comes into view
+  const reveal = new IntersectionObserver(es => {
+    for (const e of es) if (e.isIntersecting) { e.target.classList.add("in"); reveal.unobserve(e.target); }
+  }, { rootMargin: "0px 0px -12% 0px", threshold: 0 });
+  document.querySelectorAll(".sec, .final, .foot").forEach(s => reveal.observe(s));
 
-  // menu (phones): a full-screen list; Escape and any link close it
+  // phone menu: full screen; Escape and any link close it
   const menu = document.getElementById("menu")!, btn = document.getElementById("menuBtn")!;
-  const setMenu = (open: boolean) => { menu.hidden = !open; btn.setAttribute("aria-expanded", String(open)); btn.textContent = open ? "Close" : "Menu"; };
+  const setMenu = (open: boolean) => {
+    menu.hidden = !open;
+    btn.setAttribute("aria-expanded", String(open));
+    btn.textContent = open ? "Close" : "Menu";
+    root.classList.toggle("menu-open", open);
+  };
   btn.addEventListener("click", () => setMenu(menu.hidden));
   menu.addEventListener("click", e => { if ((e.target as HTMLElement).closest("a")) setMenu(false); });
   addEventListener("keydown", e => { if (e.key === "Escape" && !menu.hidden) { setMenu(false); btn.focus(); } });
+  matchMedia("(min-width: 900px)").addEventListener("change", e => { if (e.matches) setMenu(false); });
 }

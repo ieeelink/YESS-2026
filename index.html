@@ -4,192 +4,184 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>{{EVENT_NAME}} · {{EVENT_FULL_NAME}} · {{DATE_DAY_MONTH}} {{DATE_YEAR}}</title>
-<meta name="description" content="{{EVENT_NAME}}, the {{EVENT_FULL_NAME}}. {{DATE_DAY_MONTH}} {{DATE_YEAR}}, {{VENUE_NAME}}, {{VENUE_CITY}}. {{ORGANIZED_BY}}.">
-<meta name="theme-color" content="#030705">
+<meta name="description" content="{{EVENT_NAME}}, the {{EVENT_FULL_NAME}}. {{DATE_DAY_MONTH}} {{DATE_YEAR}}, {{HOURS_LABEL}}, {{VENUE_SHORT}}, {{VENUE_CITY}}. {{ORGANIZED_BY}}.">
+<meta name="theme-color" content="#050605">
 <meta name="color-scheme" content="dark">
 <meta property="og:type" content="website">
+<meta property="og:site_name" content="{{EVENT_NAME}}">
 <meta property="og:title" content="{{EVENT_NAME}} · {{DATE_DAY_MONTH}} {{DATE_YEAR}}">
-<meta property="og:description" content="{{EVENT_FULL_NAME}}. One day at {{VENUE_NAME}}, {{VENUE_CITY}}.">
+<meta property="og:description" content="{{EVENT_FULL_NAME}}. One day at {{VENUE_SHORT}}, {{VENUE_CITY}}. {{ORGANIZED_BY}}.">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{EVENT_NAME}} · {{DATE_DAY_MONTH}} {{DATE_YEAR}}">
+<meta name="twitter:description" content="{{EVENT_FULL_NAME}}. One day at {{VENUE_SHORT}}, {{VENUE_CITY}}.">
 {{SITE_META}}
-<!-- Temporary favicon: the supplied loading mark, used as-is until a proper icon set arrives. -->
 <link rel="icon" type="image/png" href="./assets/yess-loading-mark.png">
+<link rel="apple-touch-icon" href="./assets/yess-loading-mark.png">
 <link rel="preload" as="font" type="font/woff2" crossorigin href="./assets/fonts/big-shoulders-display-latin-wght-normal.woff2">
 <link rel="preload" as="font" type="font/woff2" crossorigin href="./assets/fonts/hanken-grotesk-latin-wght-normal.woff2">
+<script>
+  // Before first paint: mark JS on, and decide whether the trailer plays (once per session, never with reduced motion).
+  (function () {
+    var d = document.documentElement, q = new URLSearchParams(location.search), played = false;
+    d.classList.add("js");
+    try { played = sessionStorage.getItem("yess26-intro") === "1"; } catch (e) {}
+    var rm = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (q.get("intro") === "1" || (!played && !rm && q.get("intro") !== "0")) d.classList.add("has-intro");
+    setTimeout(function () { d.classList.add("ready"); d.classList.remove("has-intro"); }, 7000); // failsafe: never leave the hero hidden
+  })();
+</script>
 <script type="module" src="/src/main.ts"></script>
 </head>
-<body class="locked">
-<a class="skip" href="#about">Skip to content</a>
-<div class="progress" aria-hidden="true"><i id="progress"></i></div>
+<body>
+<a class="skip-link" href="#about">Skip to content</a>
 
-<header class="site-nav" id="nav">
-  <a class="site-nav__mark" href="#summit">{{EVENT_NAME}}</a>
-  <nav class="site-nav__links" aria-label="Sections">
-    <a href="#summit">Summit</a><a href="#highlights">Highlights</a><a href="#programme">Programme</a><a href="#venue">Venue</a><a href="#partners">Partners</a><a href="#faq">FAQ</a>
-  </nav>
-  <button class="site-nav__menu" id="menuBtn" type="button" aria-expanded="false" aria-controls="menu">Menu</button>
+<!-- The world: near-black, a deep fog that drifts with scroll, film grain. Behind everything, never over content. -->
+<div class="world" aria-hidden="true"><i class="world__fog world__fog--a"></i><i class="world__fog world__fog--b"></i><i class="world__grain"></i></div>
+
+<!-- The trailer. Plays once per session, about five seconds, then hands the logo to the hero. -->
+<div class="intro" id="intro">
+  <div class="intro__film" aria-hidden="true">
+    <i class="intro__door intro__door--l"></i><i class="intro__door intro__door--r"></i>
+    <i class="intro__cut"></i>
+    <p class="intro__card intro__card--1">One day</p>
+    <p class="intro__card intro__card--2"><span>{{DATE_DAY_MONTH}}</span></p>
+    <p class="intro__card intro__card--3">{{VENUE_CITY}}</p>
+    <img class="intro__logo logo" id="introLogo" src="./assets/YESS_Logo.svg" width="1202" height="463" alt="">
+  </div>
+  <button class="intro__skip" id="introSkip" type="button">Skip intro</button>
+</div>
+
+<header class="nav" id="nav">
+  <div class="nav__in">
+    <a class="nav__logo" href="#top" aria-label="{{EVENT_NAME}}, back to top"><img class="logo" src="./assets/YESS_Logo.svg" width="1202" height="463" alt=""></a>
+    <nav class="nav__links" aria-label="Sections">
+      <a href="#about">About</a><a href="#highlights">Highlights</a><a href="#programme">Programme</a><a href="#venue">Venue</a><a href="#partners">Partners</a><a href="#faq">FAQ</a>
+    </nav>
+    <button class="nav__menu" id="menuBtn" type="button" aria-expanded="false" aria-controls="menu">Menu</button>
+  </div>
 </header>
 <div class="menu" id="menu" hidden>
   <nav aria-label="Sections, full list">
-    <a href="#summit">Summit</a><a href="#highlights">Highlights</a><a href="#programme">Programme</a><a href="#venue">Venue</a><a href="#partners">Partners</a><a href="#faq">FAQ</a>
+    <a href="#about">About</a><a href="#highlights">Highlights</a><a href="#programme">Programme</a><a href="#venue">Venue</a><a href="#partners">Partners</a><a href="#faq">FAQ</a><a href="#notify">Get notified</a>
   </nav>
 </div>
 
 <main>
-  <!-- 1. The arch. A tall wrapper: scrolling it opens the doors and carries the camera through them. -->
-  <section class="hero" id="summit" data-nav="summit" aria-label="{{EVENT_NAME}}">
-    <div class="stage" id="stage">
-      <div class="stage__still" aria-hidden="true"></div>
-      <canvas id="gl" aria-hidden="true"></canvas>
-      <div class="cut" id="cut" aria-hidden="true"></div>
-      <div class="bar bar--t" aria-hidden="true"></div>
-      <div class="bar bar--b" aria-hidden="true"></div>
-
-      <div class="card c1" aria-hidden="true"><p><span><b>One</b></span> <span><b>day</b></span></p></div>
-      <div class="card c2" aria-hidden="true"><p>{{DATE_DAY_MONTH}}</p></div>
-      <div class="card c3" aria-hidden="true"><p>{{VENUE_CITY}}</p></div>
-
-      <div class="lockup" id="lockup">
-        <h1 class="sr-only">{{EVENT_NAME}}, {{EVENT_FULL_NAME}}</h1>
-        <div class="lockup__logo"><img class="logo" src="./assets/YESS_Logo.svg" width="1202" height="463" alt="IEEE YESS, Yearly Engineering Students Summit 2026"></div>
-        <p class="date rv" style="--i:0"><span>{{DATE_DAY_MONTH}} {{DATE_YEAR}}</span></p>
-        <dl class="facts fade" style="--i:3">
-          <div><dt>When</dt><dd>{{HOURS_LABEL}}</dd></div>
-          <div><dt>Where</dt><dd>{{VENUE_NAME}}, {{VENUE_CITY}}</dd></div>
-        </dl>
-        <div class="actions fade" style="--i:6">
-          {{CTA_HERO}}
-          <a class="link link--down" href="#about">Explore the summit</a>
-        </div>
-        <p class="credit fade" style="--i:8">{{ORGANIZED_BY}}</p>
+  <section class="hero" id="top" aria-labelledby="heroTitle">
+    <div class="wrap hero__grid">
+      <div class="hero__light" aria-hidden="true"><i class="hero__spill"></i><i class="hero__beam"></i><i class="hero__pool"></i></div>
+      <div class="hero__main">
+        <h1 class="hero__logo" id="heroTitle"><img class="logo" id="heroLogo" src="./assets/YESS_Logo.svg" width="1202" height="463" alt="IEEE YESS, Yearly Engineering Students Summit 2026" fetchpriority="high"></h1>
+        <p class="hero__date in-1">{{DATE_DAY_MONTH}} {{DATE_YEAR}}</p>
+        <p class="hero__line in-2">{{HOURS_LABEL}} <span aria-hidden="true">·</span> {{VENUE_SHORT}}, {{VENUE_CITY}}</p>
+        <div class="hero__cta in-3">{{CTA}}</div>
       </div>
-
-      <!-- The countdown is written on the doors it counts down to; script keeps it pinned to them. -->
-      <div class="doors" id="doors"><div class="doors__in fade" style="--d:700ms">
-        <p class="doors__label" id="doorsLabel">Doors open in</p>
-        <div class="count" id="count" role="timer" aria-labelledby="doorsLabel">
-          <div><b data-cd="d">--</b><span>days</span></div>
-          <div><b data-cd="h">--</b><span>hrs</span></div>
-          <div><b data-cd="m">--</b><span>min</span></div>
-          <div><b data-cd="s">--</b><span>sec</span></div>
+      <div class="hero__count in-4">
+        <p class="hero__count-label" id="countLabel">Doors open in</p>
+        <div class="count" id="count" role="timer" aria-labelledby="countLabel">
+          <div class="count__cell"><b data-cd="d">--</b><span>Days</span></div>
+          <div class="count__cell"><b data-cd="h">--</b><span>Hours</span></div>
+          <div class="count__cell"><b data-cd="m">--</b><span>Minutes</span></div>
+          <div class="count__cell"><b data-cd="s">--</b><span>Seconds</span></div>
         </div>
-      </div></div>
-
-      <p class="hint fade" style="--d:1500ms" aria-hidden="true">Scroll to open the doors</p>
-
-      <div class="ctl">
-        <button id="skip" type="button"><span id="skipLabel">Skip intro</span><i aria-hidden="true"></i></button>
-        <button id="snd" type="button" aria-pressed="false">Sound <b>off</b></button>
+      </div>
+    </div>
+    <div class="hero__org in-5">
+      <div class="wrap hero__org-in">
+        <p class="hero__org-label">Organized by</p>
+        <div class="mq" id="marquee"><div class="mq__track">{{MARQUEE}}</div></div>
       </div>
     </div>
   </section>
 
-  <!-- 2. Through the doors: what YESS is. -->
-  <section class="about" id="about" data-nav="summit" aria-labelledby="aboutTitle">
-    <div class="about__stage" id="aboutStage">
-      <div class="wrap about__in">
-        <p class="eyebrow rv"><span>{{KICKER}}</span></p>
-        <h2 class="about__statement" id="aboutTitle" data-split>{{ABOUT}}</h2>
-        <dl class="about__facts fade" style="--d:500ms">
-          <div><dt>Date</dt><dd>{{DATE_DAY_MONTH}} {{DATE_YEAR}}</dd></div>
-          <div><dt>Venue</dt><dd>{{VENUE_NAME}}</dd></div>
-          <div><dt>Organizers</dt><dd>IEEE LINK, IEEE Kerala Section</dd></div>
-        </dl>
-      </div>
+  <section class="sec about" id="about" aria-labelledby="aboutTitle">
+    <div class="wrap sec__grid">
+      <h2 class="label rv" id="aboutTitle"><span class="label__n">01</span><span class="label__t">About</span></h2>
+      <p class="statement" data-split>{{ABOUT}}</p>
     </div>
   </section>
 
-  <!-- 3. The hall of moments. -->
-  <section class="sec gallery" id="highlights" data-nav="highlights" aria-labelledby="hlTitle">
-    <div class="wrap gallery__head">
-      <div>
-        <p class="eyebrow rv"><span>YESS 2025 · The moments we made</span></p>
-        <h2 class="title rv" id="hlTitle" style="--i:1"><span>Highlights of YESS 25</span></h2>
-      </div>
-      <p class="lede fade" style="--i:3">A look back at the people, ideas and moments that brought us together.</p>
+  <section class="sec gallery" id="highlights" aria-labelledby="hlTitle">
+    <div class="wrap sec__grid sec__head">
+      <p class="label rv"><span class="label__n">02</span><span class="label__t">Highlights</span></p>
+      <h2 class="title" id="hlTitle"><span class="mask"><span>Highlights of YESS 25</span></span></h2>
     </div>
-    <div class="strip" id="strip" tabindex="0" role="region" aria-label="Photographs from YESS 2025. Drag, scroll or use the arrow keys.">
+    <div class="strip" id="strip" tabindex="0" role="region" aria-label="Photographs from YESS 2025. Drag, swipe or use the arrow keys.">
       <ul class="strip__track">
         {{HIGHLIGHTS}}
       </ul>
     </div>
-    <div class="wrap gallery__foot">
-      <p class="counter" aria-live="polite"><b id="hlNow">01</b><span> / {{HIGHLIGHTS_COUNT}}</span></p>
+    <div class="wrap gallery__foot fade">
+      <p class="counter" aria-live="polite"><span class="sr-only">Photograph </span><b id="hlNow">01</b> / {{HIGHLIGHTS_COUNT}}</p>
       <div class="gallery__nav">
-        <button class="btn btn--line btn--sq" id="hlPrev" type="button" aria-label="Previous photograph">←</button>
-        <button class="btn btn--line btn--sq" id="hlNext" type="button" aria-label="Next photograph">→</button>
+        <button class="btn btn--secondary btn--icon" id="hlPrev" type="button" aria-label="Previous photograph"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M14 8H2M6.5 3.5 2 8l4.5 4.5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></button>
+        <button class="btn btn--secondary btn--icon" id="hlNext" type="button" aria-label="Next photograph"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M2 8h12M9.5 3.5 14 8l-4.5 4.5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></button>
       </div>
     </div>
   </section>
 
-  <!-- 4. The day. -->
-  <section class="sec programme" id="programme" data-nav="programme" aria-labelledby="prTitle">
-    <div class="wrap">
-      <div class="programme__head">
-        <p class="eyebrow rv"><span>{{DATE_DAY_MONTH}} {{DATE_YEAR}}</span></p>
-        <h2 class="title rv" id="prTitle" style="--i:1"><span>The day, hour by hour</span></h2>
+  <section class="sec programme" id="programme" aria-labelledby="prTitle">
+    <div class="wrap sec__grid sec__head">
+      <p class="label rv"><span class="label__n">03</span><span class="label__t">Programme</span></p>
+      <div>
+        <h2 class="title" id="prTitle"><span class="mask"><span>Programme to be</span></span> <span class="mask"><span>announced</span></span></h2>
+        <p class="lede fade">Sessions, speakers and tracks will be unsealed here, hour by hour.</p>
       </div>
+    </div>
+    <div class="wrap">
       {{PROGRAMME}}
     </div>
   </section>
 
-  <!-- 5. Where the doors are. -->
-  <section class="sec venue" id="venue" data-nav="venue" aria-labelledby="vnTitle">
-    <div class="wrap venue__grid">
-      <div class="venue__text">
-        <p class="eyebrow rv"><span>The venue · {{VENUE_CITY}}</span></p>
-        <h2 class="venue__name" id="vnTitle" data-split>{{VENUE_NAME}}</h2>
-        <a class="btn fade" style="--d:400ms" href="{{DIRECTIONS_URL}}" target="_blank" rel="noopener">Get directions</a>
-      </div>
-      <div class="venue__arch fade" style="--d:200ms">
-        <img src="./assets/host/host-campus-1024.webp" width="1024" height="768" loading="lazy" decoding="async" alt="The main building of Mar Baselios College of Engineering and Technology, with a statue of Christ above the entrance arch.">
-      </div>
-    </div>
-  </section>
-
-  <!-- 6. Who stands behind it. -->
-  <section class="sec partners" id="partners" data-nav="partners" aria-labelledby="ptTitle">
-    <div class="wrap">
-      <p class="eyebrow rv"><span>Organizers</span></p>
-      <h2 class="title rv" id="ptTitle" style="--i:1"><span>Partners and sponsors</span></h2>
-      <ul class="orgs fade" style="--d:300ms">
-        <li><a class="tile tile--org" href="{{LINK_IEEE}}" target="_blank" rel="noopener"><img src="./assets/partners/ieee.png" width="1192" height="348" style="width:220px" alt="IEEE" loading="lazy"></a></li>
-        <li><a class="tile tile--org" href="{{LINK_KERALA}}" target="_blank" rel="noopener"><img src="./assets/partners/ieee-kerala-section.png" width="216" height="53" style="width:108px" alt="IEEE Kerala Section" loading="lazy"></a></li>
-        <li><a class="tile tile--org" href="{{LINK_LINK}}" target="_blank" rel="noopener"><img src="./assets/partners/ieee-link.png" width="314" height="76" style="width:157px" alt="IEEE LINK, Local Integrated Network of Kerala IEEE Students" loading="lazy"></a></li>
-      </ul>
-      <div class="tiers">
-        {{SPONSORS}}
+  <section class="sec venue" id="venue" aria-labelledby="vnTitle">
+    <div class="wrap sec__grid">
+      <p class="label rv"><span class="label__n">04</span><span class="label__t">Venue</span></p>
+      <div class="venue__grid">
+        <h2 class="venue__name" id="vnTitle"><span class="mask"><span>{{VENUE_L1}}</span></span> <span class="mask"><span>{{VENUE_L2}}</span></span></h2>
+        <div class="venue__meta">
+          <p class="venue__city fade">{{VENUE_CITY}}</p>
+          <a class="btn btn--secondary fade" href="{{DIRECTIONS_URL}}" target="_blank" rel="noopener">Get directions <svg class="btn__icon" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 9 9 3M4 3h5v5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg><span class="sr-only"> (opens Google Maps)</span></a>
+        </div>
+        <figure class="venue__photo fade">
+          <img src="./assets/host/host-campus-1024.webp" srcset="./assets/host/host-campus-640.webp 640w, ./assets/host/host-campus-1024.webp 1024w" sizes="(min-width: 900px) 512px, calc(100vw - 40px)" width="1024" height="768" loading="lazy" decoding="async" alt="The main building of Mar Baselios College of Engineering and Technology, with a statue above the entrance and a sports court in front.">
+        </figure>
       </div>
     </div>
   </section>
 
-  <!-- 7. Questions. -->
-  <section class="sec faq" id="faq" data-nav="faq" aria-labelledby="fqTitle">
-    <div class="wrap faq__grid">
+  <section class="sec partners" id="partners" aria-labelledby="ptTitle">
+    <div class="wrap sec__grid sec__head">
+      <p class="label rv"><span class="label__n">05</span><span class="label__t">Partners</span></p>
+      <div>
+        <h2 class="title" id="ptTitle"><span class="mask"><span>Partners and sponsors</span></span></h2>
+        <p class="lede fade">The partners of YESS 2026 will be announced here.</p>
+      </div>
+    </div>
+    <div class="wrap tiers fade">
+      {{SPONSORS}}
+    </div>
+  </section>
+
+  <section class="sec faq" id="faq" aria-labelledby="fqTitle">
+    <div class="wrap sec__grid">
       <div class="faq__head">
-        <p class="eyebrow rv"><span>Before you come</span></p>
-        <h2 class="title rv" id="fqTitle" style="--i:1"><span>Questions, answered</span></h2>
+        <p class="label rv"><span class="label__n">06</span><span class="label__t">FAQ</span></p>
       </div>
-      <div class="faq__list">
-        {{FAQ}}
+      <div>
+        <h2 class="title" id="fqTitle"><span class="mask"><span>Questions</span></span></h2>
+        <div class="faq__list fade">
+          {{FAQ}}
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- 8. The final call. -->
-  <section class="sec final" id="register" aria-labelledby="fnTitle">
-    <div class="final__bg" aria-hidden="true"></div>
+  <section class="final" id="register" aria-labelledby="fnTitle">
+    <div class="final__light" aria-hidden="true"><i class="final__beam"></i><i class="final__spill"></i></div>
     <div class="wrap final__in">
-      <p class="eyebrow rv" id="finalLabel"><span>Doors open in</span></p>
-      <div class="count count--xl fade" id="countFinal" role="timer" aria-labelledby="finalLabel" style="--d:150ms">
-        <div><b data-cd="d">--</b><span>days</span></div>
-        <div><b data-cd="h">--</b><span>hrs</span></div>
-        <div><b data-cd="m">--</b><span>min</span></div>
-        <div><b data-cd="s">--</b><span>sec</span></div>
-      </div>
-      <h2 class="final__line rv" id="fnTitle" style="--i:3"><span><b>{{DATE_DAY_MONTH}} {{DATE_YEAR}}</b> <i>·</i> <b>{{VENUE_CITY}}</b></span></h2>
-      <p class="final__venue fade" style="--d:450ms">{{VENUE_NAME}}</p>
-      <div class="actions actions--c fade" style="--d:550ms">{{CTA_FINAL}}</div>
+      <h2 class="final__line" id="fnTitle"><span class="mask"><span>Be in the room.</span></span></h2>
+      <p class="final__facts fade"><span>{{DATE_DAY_MONTH}} {{DATE_YEAR}}</span> <span aria-hidden="true">·</span> <span>{{HOURS_LABEL}}</span><br><span>{{VENUE_SHORT}}, {{VENUE_CITY}}</span></p>
+      <div class="final__cta fade">{{CTA}}</div>
     </div>
   </section>
 </main>
@@ -198,31 +190,35 @@
   <div class="wrap">
     <div class="foot__top">
       <div class="foot__brand">
-        <img class="foot__logo" src="./assets/YESS_Logo.svg" width="1202" height="463" alt="IEEE YESS, Yearly Engineering Students Summit 2026" loading="lazy">
+        <img class="logo foot__logo" src="./assets/YESS_Logo.svg" width="1202" height="463" alt="IEEE YESS, Yearly Engineering Students Summit 2026" loading="lazy">
       </div>
-      <nav class="foot__col" aria-label="Sections">
-        <h2>Sections</h2>
+      <div class="foot__notify">
+        <h2 class="foot__h">Get notified</h2>
+        {{NOTIFY}}
+      </div>
+    </div>
+    <div class="foot__cols">
+      <nav class="foot__col" aria-label="Sections, footer">
+        <h2 class="foot__h">Sections</h2>
         <ul class="foot__list">
-          <li><a class="link" href="#summit">Summit</a></li><li><a class="link" href="#highlights">Highlights</a></li><li><a class="link" href="#programme">Programme</a></li>
+          <li><a class="link" href="#about">About</a></li><li><a class="link" href="#highlights">Highlights</a></li><li><a class="link" href="#programme">Programme</a></li>
           <li><a class="link" href="#venue">Venue</a></li><li><a class="link" href="#partners">Partners</a></li><li><a class="link" href="#faq">FAQ</a></li>
         </ul>
       </nav>
       <div class="foot__col">
-        <h2>Organizers</h2>
+        <h2 class="foot__h">Organizers</h2>
         <ul class="foot__list">
-          <li><a class="link" href="{{LINK_IEEE}}" target="_blank" rel="noopener">IEEE</a></li>
-          <li><a class="link" href="{{LINK_KERALA}}" target="_blank" rel="noopener">IEEE Kerala Section</a></li>
           <li><a class="link" href="{{LINK_LINK}}" target="_blank" rel="noopener">IEEE LINK</a></li>
+          <li><a class="link" href="{{LINK_KERALA}}" target="_blank" rel="noopener">IEEE Kerala Section</a></li>
+          <li><a class="link" href="{{LINK_IEEE}}" target="_blank" rel="noopener">IEEE</a></li>
         </ul>
-        {{SOCIALS}}
       </div>
-      <div class="foot__col foot__notify">
-        <h2>Still have questions?</h2>
-        {{NOTIFY}}
-      </div>
+      {{SOCIALS}}
     </div>
-    <p class="foot__mark" aria-hidden="true">IEEE YESS</p>
-    <p class="foot__legal">© 2026 IEEE YESS. Organized by IEEE LINK TEAM</p>
+    <div class="foot__legal">
+      <p>© 2026 IEEE YESS. Organized by IEEE LINK TEAM</p>
+      <a class="link" href="#top">Back to top</a>
+    </div>
   </div>
 </footer>
 </body>
