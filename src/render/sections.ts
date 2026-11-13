@@ -16,11 +16,14 @@ const out = `<svg class="btn__icon" width="12" height="12" viewBox="0 0 12 12" a
 export const primary = (label: string, icon: string = arrow) =>
   `<span class="btn__label">${label}</span><span class="btn__arrow" aria-hidden="true">${icon}</span>`;
 
-/** The one primary action. "Register now" once CONFIG.REGISTER_URL is set; until then it points at the footer form. */
+/**
+ * The one primary action. "Register now" once CONFIG.REGISTER_URL is set; until then a short "Get notified"
+ * that points at the footer form, with "Registration opens soon" as a small note beside it.
+ */
 export const cta = () =>
   CONFIG.REGISTER_URL
-    ? `<a class="btn btn--primary" href="${esc(CONFIG.REGISTER_URL)}" target="_blank" rel="noopener">${primary("Register now", out)}<span class="sr-only"> (opens in a new tab)</span></a>`
-    : `<a class="btn btn--primary" href="#notify">${primary('<span class="btn__soft">Registration opens soon</span><span class="btn__dot" aria-hidden="true">·</span>Get notified')}</a>`;
+    ? `<div class="cta"><a class="btn btn--primary" href="${esc(CONFIG.REGISTER_URL)}" target="_blank" rel="noopener">${primary("Register now", out)}<span class="sr-only"> (opens in a new tab)</span></a></div>`
+    : `<div class="cta"><p class="cta__note">Registration opens soon</p><a class="btn btn--primary" href="#notify">${primary("Get notified")}</a></div>`;
 
 /**
  * The organizer marquee. One set of logos, repeated so each half of the track is wider than any
@@ -29,7 +32,7 @@ export const cta = () =>
  */
 export function marquee() {
   const set = (hidden: boolean) =>
-    CONFIG.ORGANIZERS.map(o => `<li class="mq__item"${hidden ? ' aria-hidden="true"' : ""}><img src="./assets/partners/${o.file}" width="${o.w}" height="${o.h}" style="--ar:${(o.w / o.h).toFixed(4)}" alt="${hidden ? "" : esc(o.name)}" decoding="async"></li>`).join("");
+    CONFIG.ORGANIZERS.map(o => `<li class="mq__item"${hidden ? ' aria-hidden="true"' : ""}><img src="./assets/partners/${o.file}" width="${o.w}" height="${o.h}" style="--hh:${o.hh}" alt="${hidden ? "" : esc(o.name)}" decoding="async"></li>`).join("");
   const half = (first: boolean) => Array.from({ length: 4 }, (_, i) => set(!(first && i === 0))).join("");
   return `<ul class="mq__half">${half(true)}</ul><ul class="mq__half" aria-hidden="true">${half(false)}</ul>`;
 }

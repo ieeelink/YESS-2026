@@ -1,61 +1,55 @@
 /**
- * The trailer. About five seconds: a cut of light opens on black, three title cards hard-cut in at
- * different scales, the logo arrives, the doors part along the cut and the logo travels to its place
- * in the hero. Plays once per session (decided before first paint in index.html), never with
- * reduced motion. Skip button, Escape, or ?intro=0 end it at once; ?intro=1 forces it.
+ * The light reveals the crowd. On every load the hero's beam sweeps once across last year's crowd
+ * (about 1.2 s) and settles at its resting line. On the first visit of a session the type waits behind
+ * it: everything but the lit crowd is dark, and once the beam has settled the page opens outward from
+ * the beam's line like a pair of doors (about 0.85 s). The opening uses the same vw position as the beam,
+ * so it starts exactly where the light rests at every breakpoint.
+ *
+ * Nothing is locked: any key, click, touch or scroll finishes it at once. Never with reduced motion
+ * (decided before first paint in index.html, where the beam also starts at rest); ?intro=1 forces the
+ * reveal, ?intro=0 skips it. The earlier title-card trailer is in git history (commit 7079529).
  */
 export function runIntro(done: () => void) {
   const root = document.documentElement;
-  const intro = document.getElementById("intro")!;
-  if (!root.classList.contains("has-intro")) { intro.remove(); done(); return; }
+  const sweep = () => root.classList.add("sweep");
+  // two frames: the beam's starting position must paint once before it moves
+  const nextPaint = (fn: () => void) => requestAnimationFrame(() => requestAnimationFrame(fn));
+
+  if (!root.classList.contains("has-intro")) { done(); nextPaint(sweep); return; }
   try { sessionStorage.setItem("yess26-intro", "1"); } catch { /* private mode: it may replay, that is fine */ }
   if ("scrollRestoration" in history) history.scrollRestoration = "manual";
   scrollTo(0, 0);
 
-  const logo = document.getElementById("introLogo")!, heroLogo = document.getElementById("heroLogo")!;
-  const skip = document.getElementById("introSkip")!;
   const timers: number[] = [];
   const at = (ms: number, fn: () => void) => timers.push(window.setTimeout(fn, ms));
-  const shot = (s: string) => { intro.dataset.shot = s; };
-  let finished = false;
+  const inputs = ["keydown", "pointerdown", "wheel", "touchstart"] as const;
+  let opened = false, ended = false;
 
-  const finish = () => {
-    if (finished) return;
-    finished = true;
-    timers.forEach(clearTimeout);
-    root.classList.add("handoff");
-    root.classList.remove("flying", "has-intro");
-    intro.remove();
-    removeEventListener("keydown", onKey);
+  const open = () => {
+    if (opened) return;
+    opened = true;
+    root.classList.add("opened");
     done();
   };
-
-  const handoff = () => {
-    const a = logo.getBoundingClientRect(), b = heroLogo.getBoundingClientRect();
-    const dx = b.left + b.width / 2 - (a.left + a.width / 2);
-    const dy = b.top + b.height / 2 - (a.top + a.height / 2);
-    root.classList.add("flying", "lit");
-    logo.style.transition = "transform 1.1s cubic-bezier(0.76, 0, 0.24, 1)";
-    logo.style.transform = `translate(calc(-50% + ${dx.toFixed(1)}px), calc(-50% + ${dy.toFixed(1)}px)) scale(${(b.width / a.width).toFixed(4)})`;
-    intro.classList.add("open");
-    at(1150, finish);
-  };
-
-  const cut = () => {
+  const end = () => {
+    if (ended) return;
+    ended = true;
     timers.forEach(clearTimeout);
-    root.classList.add("ready");
-    intro.classList.add("done");
-    window.setTimeout(finish, 320);
+    inputs.forEach(t => removeEventListener(t, skip));
+    root.classList.remove("has-intro", "opened", "fast");
   };
-  const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") cut(); };
-  skip.addEventListener("click", cut);
-  addEventListener("keydown", onKey);
+  const skip = () => {
+    if (ended) return;
+    timers.forEach(clearTimeout);
+    root.classList.add("fast", "sweep");
+    open();
+    window.setTimeout(end, 380);
+  };
+  inputs.forEach(t => addEventListener(t, skip, { passive: true }));
 
-  at(180, () => intro.classList.add("cut-on"));
-  at(520, () => shot("1"));
-  at(1440, () => shot("2"));
-  at(2440, () => shot("3"));
-  at(3360, () => { shot(""); intro.classList.add("cut-hot"); });
-  at(3520, () => shot("logo"));
-  at(4480, handoff);
+  nextPaint(() => {
+    sweep(); //            0.00–1.20 s  the beam sweeps across the crowd and settles
+    at(900, open); //      0.90–1.75 s  the page opens outward from the beam's line
+    at(1800, end); //      1.80 s       done
+  });
 }

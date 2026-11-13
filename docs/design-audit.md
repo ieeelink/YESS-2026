@@ -124,3 +124,75 @@ Screenshots after: `docs/shots/after/` (1440, 820, 390; hero also at 1280x620 an
 - Legal line centred under a hairline, "IEEE LINK" underlined as a link.
 - **Primary button** is now the two-part chamfered style everywhere (hero, final call, footer): a label block with its top-left corner cut at 45° and a separate arrow block with its bottom-right corner cut, 4 px apart; hover lightens both and nudges the arrow. Secondary stays a 1 px outline.
 - Build passes; Lighthouse mobile 99 / 100 / 100 / 100 after the change.
+
+## Reveal and hero, one step further (13 Nov, third request)
+
+Analysis and options: `docs/intro-hero-analysis.md`. Approved plan executed (option C).
+
+- **Reveal replaces the trailer.**
+  - About 1.4 s. Two black doors cover the composed page, a cut of light draws exactly where the hero's light sits, then the doors part along it.
+  - The cut is measured from the hero light, so it matches at every breakpoint: vertical on wide screens, horizontal on phones.
+  - The date and the countdown rise as the doors open.
+  - No scroll lock and no skip button: any key, click, touch or scroll opens the doors at once.
+  - Once per session; never with reduced motion. `?intro=1` forces it and `?intro=0` skips it.
+  - The 6.5 s title-card trailer stays in git history (commit 7079529, `src/intro.ts`) for a later cut or a social video.
+  - Frames: `docs/shots/reveal/` (every 100 ms at 1440 and 390).
+- **Hierarchy:**
+  - The date leads: two lines at 144 px at 1440 (`--F`).
+  - The logo is 340 px wide at 1440, untouched, and nothing crosses it.
+  - A new "what" line sits under it, from `CONFIG.WHAT_LINE` (marked TODO-confirm; set it to null to remove the line).
+- **Countdown:**
+  - Numerals at the date's size, two rows, sharing baselines with the two date lines across the light (verified to the pixel at 1440, 1366, 1280 and 820).
+  - Seconds are white. Green is reserved for the light, the CTA and focus.
+  - Phones use one row of four at the same size.
+- **Info:** hours on one line, the venue name on the next (never broken), the city below.
+- **Organizers:** a static row of three from 600 px up; a marquee only below 600 px.
+- **Light:**
+  - A wall falloff behind the date's edge and the countdown.
+  - A bloom where the cut meets the floor, and a wider floor pool.
+  - Fog reduced by about 40% for truer blacks.
+  - On desktop with a fine pointer, the light brightens and the pool leans slightly toward the pointer (transform and opacity only). The slow "breathe" loop was removed.
+- **Layout:**
+  - Desktop composition from 820 px.
+  - Portrait screens no longer force full height, so the empty band on top is gone.
+  - Phones lose the empty top space and get the date on two lines at 63–76 px (was 51 px).
+  - Everything, including the organizer row, fits 1440x900, 1366x700, 1280x800, 390x844 and 375x667.
+- **Verified:**
+  - Build passes, no console errors, no horizontal overflow at any size.
+  - Reduced motion: no reveal, static hero and static organizer row.
+  - Input skip opens the doors about 0.3 s after any input; a same-session reload skips the reveal.
+  - Lighthouse mobile, with the reveal playing: 99 / 100 / 100 / 100 (LCP 2.1 s, CLS 0, TBT 0 ms).
+  - The OG image was re-rendered.
+
+## Hero redesign: "the light reveals the crowd" (13 Nov, fourth request)
+
+- **Background:**
+  - `yess25-05`, the evening concert seen from the back, graded to `src/img/hero-crowd.webp` (`assets/` untouched).
+  - The grade: saturation 12%, crushed blacks, a slight green cast that only shows in the highlights, and a light blur so it reads as atmosphere at 2x (the file is 1800 px wide).
+  - Unlit, it sits at 24% opacity. A left shade and a bottom shade keep the type readable.
+- **The beam:**
+  - Replaces the 1 px line and the floor rule: a soft, wide emerald column with a brighter core, a falloff toward the roof and a pool on the crowd.
+  - A masked window of the photo moves with the beam and counter-moves inside it (transform only), so the crowd is seen where the light falls.
+  - On load it sweeps in from off the right edge (1.2 s) and rests at 68vw (76 on tablets, 70 on phones). It never passes the logo.
+  - Desktop pointer lean is at most ±1.5vw.
+  - First visit: everything but the lit crowd stays dark until the beam rests, then the type opens outward from the beam's exact line (clip-path in the same vw units).
+- **Type:**
+  - "19 DECEMBER / 2026" leads (162 px at 1440).
+  - The logo is unchanged at 340 px.
+  - The countdown is one quiet line ("35 DAYS · 14 HRS · 46 MIN · 20 SEC", tabular, white).
+  - One info line, breaking before the venue below 1100 px only.
+  - A short chamfered "Get notified" button with "Registration opens soon" beside it (above it on phones). The final call uses the same pair.
+  - The "what" line moved to About (still `CONFIG.WHAT_LINE`, TODO-confirm).
+- **Phones:**
+  - The lit crowd sits in a band measured between the logo and the date (`fitScene`), so neither ever sits on the photo.
+  - The date is on two lines and the countdown wraps between units.
+- **Organizers:**
+  - A real marquee at every size, 50 px/s (the duration is computed from the track width), seamless, with faded edges.
+  - Pauses on hover. Static row only for reduced motion.
+  - The label stays outside the track.
+  - Heights are set for equal visual weight (Kerala Section 26, IEEE LINK 27, IEEE 21 px), never above half the native height, so nothing is upscaled at 2x.
+- **Verified:**
+  - Text contrast was measured against the brightest pixel behind each line: all ≥ 5.3:1, and the date ≥ 12:1.
+  - No overflow at 1440, 1366x700, 820, 390 or 375x667; the hero fits each viewport.
+  - Lighthouse mobile (first visit, with the reveal): 97 / 100 / 100 / 100, CLS 0, LCP 2.6 s (the date appears once the beam settles).
+  - Sweep frames: `docs/shots/reveal/`.

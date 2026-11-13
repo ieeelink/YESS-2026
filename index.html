@@ -20,14 +20,14 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="./assets/fonts/big-shoulders-display-latin-wght-normal.woff2">
 <link rel="preload" as="font" type="font/woff2" crossorigin href="./assets/fonts/hanken-grotesk-latin-wght-normal.woff2">
 <script>
-  // Before first paint: mark JS on, and decide whether the trailer plays (once per session, never with reduced motion).
+  // Before first paint: mark JS on, and decide whether the reveal plays (once per session, never with reduced motion).
   (function () {
     var d = document.documentElement, q = new URLSearchParams(location.search), played = false;
     d.classList.add("js");
     try { played = sessionStorage.getItem("yess26-intro") === "1"; } catch (e) {}
     var rm = matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (q.get("intro") === "1" || (!played && !rm && q.get("intro") !== "0")) d.classList.add("has-intro");
-    setTimeout(function () { d.classList.add("ready"); d.classList.remove("has-intro"); }, 7000); // failsafe: never leave the hero hidden
+    setTimeout(function () { d.classList.add("ready", "sweep"); d.classList.remove("has-intro"); }, 3000); // failsafe: never leave the hero dark
   })();
 </script>
 <script type="module" src="/src/main.ts"></script>
@@ -37,19 +37,6 @@
 
 <!-- The world: near-black, a deep fog that drifts with scroll, film grain. Behind everything, never over content. -->
 <div class="world" aria-hidden="true"><i class="world__fog world__fog--a"></i><i class="world__fog world__fog--b"></i><i class="world__grain"></i></div>
-
-<!-- The trailer. Plays once per session, about five seconds, then hands the logo to the hero. -->
-<div class="intro" id="intro">
-  <div class="intro__film" aria-hidden="true">
-    <i class="intro__door intro__door--l"></i><i class="intro__door intro__door--r"></i>
-    <i class="intro__cut"></i>
-    <p class="intro__card intro__card--1">One day</p>
-    <p class="intro__card intro__card--2"><span>{{DATE_DAY_MONTH}}</span></p>
-    <p class="intro__card intro__card--3">{{VENUE_CITY}}</p>
-    <img class="intro__logo logo" id="introLogo" src="./assets/YESS_Logo.svg" width="1202" height="463" alt="">
-  </div>
-  <button class="intro__skip" id="introSkip" type="button">Skip intro</button>
-</div>
 
 <header class="nav" id="nav">
   <div class="nav__in">
@@ -68,25 +55,23 @@
 
 <main>
   <section class="hero" id="top" aria-labelledby="heroTitle">
-    <div class="wrap hero__grid">
-      <div class="hero__light" aria-hidden="true"><i class="hero__spill"></i><i class="hero__beam"></i><i class="hero__pool"></i></div>
-      <div class="hero__main">
+    <!-- The scene: last year's crowd, graded almost to black, seen only where the light falls. Decorative. -->
+    <div class="hero__scene" aria-hidden="true">
+      <img class="hero__photo" src="./src/img/hero-crowd.webp" width="1800" height="1013" alt="" decoding="async">
+      <div class="hero__lit"><img class="hero__photo" src="./src/img/hero-crowd.webp" width="1800" height="1013" alt="" decoding="async"></div>
+      <i class="hero__shade"></i>
+      <i class="hero__beam"></i>
+    </div>
+    <div class="hero__fg">
+      <div class="wrap hero__grid">
         <h1 class="hero__logo" id="heroTitle"><img class="logo" id="heroLogo" src="./assets/YESS_Logo.svg" width="1202" height="463" alt="IEEE YESS, Yearly Engineering Students Summit 2026" fetchpriority="high"></h1>
-        <p class="hero__date in-1">{{DATE_DAY_MONTH}} {{DATE_YEAR}}</p>
-        <p class="hero__line in-2">{{HOURS_LABEL}} <span aria-hidden="true">·</span> {{VENUE_SHORT}}, {{VENUE_CITY}}</p>
+        <p class="hero__date"><span class="ln"><span style="--i:0">{{DATE_DAY_MONTH}}</span></span> <span class="ln"><span style="--i:1">{{DATE_YEAR}}</span></span></p>
+        <p class="hero__count in-1" id="count" role="timer"><span class="sr-only">Doors open in </span><span class="cu"><b data-cd="d">00</b> Days</span><span class="cs" aria-hidden="true">·</span><span class="cu"><b data-cd="h">00</b> Hrs</span><span class="cs" aria-hidden="true">·</span><span class="cu"><b data-cd="m">00</b> Min</span><span class="cs" aria-hidden="true">·</span><span class="cu"><b data-cd="s">00</b> Sec</span></p>
+        <p class="hero__line in-2">{{HOURS_SHORT}}<span class="hero__sep" aria-hidden="true">·</span><span class="hero__venue"><span class="nw">{{VENUE_SHORT}},</span> <span class="nw">{{VENUE_CITY}}</span></span></p>
         <div class="hero__cta in-3">{{CTA}}</div>
       </div>
-      <div class="hero__count in-4">
-        <p class="hero__count-label" id="countLabel">Doors open in</p>
-        <div class="count" id="count" role="timer" aria-labelledby="countLabel">
-          <div class="count__cell"><b data-cd="d">--</b><span>Days</span></div>
-          <div class="count__cell"><b data-cd="h">--</b><span>Hours</span></div>
-          <div class="count__cell"><b data-cd="m">--</b><span>Minutes</span></div>
-          <div class="count__cell"><b data-cd="s">--</b><span>Seconds</span></div>
-        </div>
-      </div>
     </div>
-    <div class="hero__org in-5">
+    <div class="hero__org in-4">
       <div class="wrap hero__org-in">
         <p class="hero__org-label">Organized by</p>
         <div class="mq" id="marquee"><div class="mq__track">{{MARQUEE}}</div></div>
@@ -97,7 +82,7 @@
   <section class="sec about" id="about" aria-labelledby="aboutTitle">
     <div class="wrap sec__grid">
       <h2 class="label rv" id="aboutTitle"><span class="label__n">01</span><span class="label__t">About</span></h2>
-      <p class="statement" data-split>{{ABOUT}}</p>
+      <div class="about__body"><p class="statement" data-split>{{ABOUT}}</p>{{WHAT}}</div>
     </div>
   </section>
 

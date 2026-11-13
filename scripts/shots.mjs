@@ -1,5 +1,5 @@
 // Screenshots for design review. usage: node scripts/shots.mjs <baseUrl> <outDir> <WxH,...> [mode]
-// mode: "hero" (first viewport only), "all" (every section), "intro" (trailer frames)
+// mode: "hero" (first viewport only), "all" (every section), "intro" (reveal frames every 100 ms)
 import { chromium } from "playwright-core";
 import { mkdirSync } from "node:fs";
 const [base = "http://localhost:5180/", out = "docs/shots/after", sizes = "1440x900,390x844", mode = "all"] = process.argv.slice(2);
@@ -13,11 +13,11 @@ for (const s of sizes.split(",")) {
   page.on("pageerror", e => errs.push(`${s}: ${e.message}`));
   page.on("console", m => { if (m.type() === "error" || m.type() === "warning") errs.push(`${s} ${m.type()}: ${m.text()}`); });
   if (mode === "intro") {
-    await page.goto(base + "?intro=1");
     const t0 = Date.now();
-    for (const t of [900, 1900, 2900, 4000, 5000, 5300, 6200]) {
+    await page.goto(base + "?intro=1", { waitUntil: "commit" });
+    for (const t of Array.from({ length: 23 }, (_, i) => i * 100)) {
       await page.waitForTimeout(Math.max(0, t - (Date.now() - t0)));
-      await page.screenshot({ path: `${out}/${w}x${h}-intro-${t}ms.jpg`, type: "jpeg", quality: 82 });
+      await page.screenshot({ path: `${out}/${w}x${h}-reveal-${String(t).padStart(4, "0")}ms.jpg`, type: "jpeg", quality: 82 });
     }
     await ctx.close(); continue;
   }

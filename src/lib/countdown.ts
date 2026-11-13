@@ -13,7 +13,7 @@ export function startCountdown(root: HTMLElement, label?: HTMLElement | null) {
     const now = Date.now();
     if (now >= start) {
       if (label) label.textContent = now < end ? "The doors are open" : CONFIG.DATE_DAY_MONTH + " " + CONFIG.DATE_YEAR;
-      root.innerHTML = `<p class="count__msg">${now < end ? "Happening now" : "YESS 2026 has concluded"}</p>`;
+      root.innerHTML = `<span class="count__msg">${now < end ? "Happening now" : "YESS 2026 has concluded"}</span>`;
       if (now < end) setTimeout(tick, Math.min(end - now + 50, 60_000));
       return;
     }

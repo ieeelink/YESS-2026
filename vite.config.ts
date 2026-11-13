@@ -17,6 +17,7 @@ function contentTokens(): Plugin {
         .filter(([, v]) => !v).map(([k]) => k);
       if (!Object.values(CONFIG.SOCIALS).some(Boolean)) todo.push("SOCIALS");
       if (todo.length) this.warn(`CONFIG still empty (src/content/config.ts): ${todo.join(", ")}`);
+      if (CONFIG.WHAT_LINE) this.warn(`CONFIG.WHAT_LINE is marked TODO-confirm: "${CONFIG.WHAT_LINE}"`);
     },
     transformIndexHtml: {
       order: "pre",
@@ -31,6 +32,7 @@ function contentTokens(): Plugin {
           DATE_DAY_MONTH: esc(CONFIG.DATE_DAY_MONTH),
           DATE_YEAR: esc(CONFIG.DATE_YEAR),
           HOURS_LABEL: esc(CONFIG.HOURS_LABEL),
+          HOURS_SHORT: esc(CONFIG.HOURS_SHORT),
           VENUE_NAME: esc(CONFIG.VENUE_NAME),
           VENUE_SHORT: esc(CONFIG.VENUE_SHORT),
           VENUE_L1: esc(CONFIG.VENUE_LINES[0]),
@@ -39,6 +41,7 @@ function contentTokens(): Plugin {
           ORGANIZED_BY: esc(CONFIG.ORGANIZED_BY),
           MARQUEE: marquee(),
           ABOUT: esc(CONFIG.ABOUT),
+          WHAT: CONFIG.WHAT_LINE ? `<p class="about__what lede fade">${esc(CONFIG.WHAT_LINE)}</p>` : "",
           LINK_IEEE: esc(CONFIG.LINKS.ieee),
           LINK_KERALA: esc(CONFIG.LINKS.ieeeKerala),
           LINK_LINK: esc(CONFIG.LINKS.ieeeLink),

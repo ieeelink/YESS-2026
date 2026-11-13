@@ -15,6 +15,8 @@ export const CONFIG = {
   DATE_DAY_MONTH: "19 December",
   DATE_YEAR: "2026",
   HOURS_LABEL: "9:00 AM – 5:00 PM IST",
+  /** The same hours, short, for the hero's info line. */
+  HOURS_SHORT: "9 AM – 5 PM IST",
 
   VENUE_NAME: "Mar Baselios College of Engineering and Technology (Autonomous)",
   /** The hero line and the final call use the short name; the venue section sets it in two lines. */
@@ -22,6 +24,12 @@ export const CONFIG = {
   VENUE_LINES: ["Mar Baselios College of", "Engineering and Technology"],
   VENUE_CITY: "Thiruvananthapuram",
   ORGANIZED_BY: "Organized by IEEE LINK under the IEEE Kerala Section",
+
+  /**
+   * TODO-confirm: a one-line "what", set under the About statement (it crowded the hero). Edit the
+   * wording, or set it to null to remove the line entirely (nothing else changes).
+   */
+  WHAT_LINE: "A one-day IEEE summit for engineering students across Kerala." as string | null,
 
   ABOUT:
     "IEEE YESS is the Yearly Engineering Students Summit, an annual IEEE gathering for engineering students. It is a space to learn, connect and build alongside fellow students.",
@@ -58,11 +66,14 @@ export const CONFIG = {
   /**
    * The organizer marquee in the hero. Real files from assets/partners, used exactly as supplied.
    * Native sizes: ieee-kerala-section.png 216x53, ieee-link.png 314x76, ieee.png 1192x348.
+   * `hh` is the displayed height in CSS px on desktop, chosen for equal visual weight rather than equal
+   * boxes: the IEEE mark's letters fill its whole box, the Kerala Section flag carries small type.
+   * Never above half the native height, so nothing is upscaled on 2x screens.
    */
   ORGANIZERS: [
-    { name: "IEEE Kerala Section", file: "ieee-kerala-section.png", w: 216, h: 53 },
-    { name: "IEEE LINK", file: "ieee-link.png", w: 314, h: 76 },
-    { name: "IEEE", file: "ieee.png", w: 1192, h: 348 },
+    { name: "IEEE Kerala Section", file: "ieee-kerala-section.png", w: 216, h: 53, hh: 26 },
+    { name: "IEEE LINK", file: "ieee-link.png", w: 314, h: 76, hh: 27 },
+    { name: "IEEE", file: "ieee.png", w: 1192, h: 348, hh: 21 },
   ],
 } as const;
 
