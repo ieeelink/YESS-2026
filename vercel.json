@@ -4,6 +4,26 @@
       "source": "/sbini",
       "destination": "https://docs.google.com/forms/d/e/1FAIpQLSfcQGlIIK4r1_qvXmy4LEFAO_lfBl45aF4P3MXP8Jx-AH-cXQ/viewform",
       "permanent": false
+    },
+    {
+      "source": "/call_for_events",
+      "destination": "https://forms.gle/5XL2nyVjFCNBgnmt6",
+      "permanent": false
+    },
+    {
+      "source": "/foodven",
+      "destination": "https://docs.google.com/forms/d/e/1FAIpQLScwEKg4TdvXNmzY7GdeULxbj6g1pSgskSmGOcCM34QpDbDnUw/viewform",
+      "permanent": false
+    },
+    {
+      "source": "/sltini",
+      "destination": "https://forms.gle/6Hq6CPeQ5gArRvfZ8",
+      "permanent": false
+    },
+    {
+      "source": "/strtini",
+      "destination": "https://docs.google.com/forms/d/e/1FAIpQLSfgV5qSZhTNBzn7du6PKVU1CZe_QR2PomPfKVvUwrvTEUDuSA/viewform",
+      "permanent": false
     }
   ],
   "rewrites": [
