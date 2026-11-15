@@ -1,5 +1,12 @@
 {
+  "redirects": [
+    {
+      "source": "/sbini",
+      "destination": "https://docs.google.com/forms/d/e/1FAIpQLSfcQGlIIK4r1_qvXmy4LEFAO_lfBl45aF4P3MXP8Jx-AH-cXQ/viewform",
+      "permanent": false
+    }
+  ],
   "rewrites": [
-    { "source": "/:path+", "destination": "https://ieee-link.org/:path+" }
+    { "source": "/:path*", "destination": "https://ieee-link.org/:path*" }
   ]
 }
