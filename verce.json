@@ -1,0 +1,5 @@
+{
+  "rewrites": [
+    { "source": "/:path+", "destination": "https://ieee-link.org/:path+" }
+  ]
+}
