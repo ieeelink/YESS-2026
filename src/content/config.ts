@@ -74,6 +74,7 @@ export const CONFIG = {
     { name: "IEEE Kerala Section", file: "ieee-kerala-section.png", w: 216, h: 53, hh: 26 },
     { name: "IEEE LINK", file: "ieee-link.png", w: 314, h: 76, hh: 27 },
     { name: "IEEE", file: "ieee.png", w: 1192, h: 348, hh: 21 },
+    { name: "MBCET IEEE Student Branch", file: "mbcet-ieee-student-branch-transparent.png", w: 377, h: 187, hh: 40 },
   ],
 } as const;
 

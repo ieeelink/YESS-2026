@@ -1,4 +1,4 @@
-/** A minimal loading scale followed by a quick fade into the event page. */
+/** Ease the YESS mark from the loading screen into the event hero. */
 export function runIntro(done: () => void) {
   const root = document.documentElement;
   const overlay = document.querySelector<HTMLElement>(".intro");
@@ -7,7 +7,7 @@ export function runIntro(done: () => void) {
   const label = document.getElementById("loadPercent");
   const bar = document.getElementById("loadProgress");
   let start = 0, raf = 0, ended = false;
-  const duration = 1900;
+  const duration = 2200;
   const finish = () => {
     if (ended) return;
     ended = true;
@@ -16,7 +16,7 @@ export function runIntro(done: () => void) {
     if (bar) bar.style.width = "100%";
     root.classList.add("loading-complete");
     done();
-    window.setTimeout(() => { root.classList.remove("has-intro", "loading-complete"); overlay.remove(); }, 500);
+    window.setTimeout(() => { root.classList.remove("has-intro", "loading-complete"); overlay.remove(); }, 900);
   };
   const progress = (now: number) => {
     if (ended) return;

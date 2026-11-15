@@ -61,11 +61,17 @@
 
 <main>
   <section class="hero" id="top" aria-labelledby="heroTitle">
+    <div class="hero__backdrop" aria-hidden="true"></div>
     <div class="hero__fg">
       <div class="wrap hero__grid">
         <h1 class="hero__logo" id="heroTitle"><img class="logo" id="heroLogo" src="./assets/YESS_Logo.svg" width="1202" height="463" alt="IEEE YESS, Yearly Engineering Students Summit 2026" fetchpriority="high"></h1>
       <p class="hero__eyebrow">Scroll to discover</p>
       <a class="hero__scroll" href="#date" aria-label="Scroll to event date"><i></i></a>
+      </div>
+    </div>
+    <div class="hero__org" aria-label="Organized with support from IEEE organizations">
+      <div class="hero__org-in wrap">
+        <div class="mq"><div class="mq__track">{{MARQUEE}}</div></div>
       </div>
     </div>
   </section>
