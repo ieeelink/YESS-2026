@@ -1,6 +1,6 @@
 import { defineConfig, type Plugin } from "vite";
 import { CONFIG } from "./src/content/config";
-import { cta, directions, esc, faq, highlights, highlightsCount, marquee, notify, programme, socials, sponsors } from "./src/render/sections";
+import { cta, directions, esc, faq, highlights, highlightsCount, marquee, notifyDialog, programme, questions, socials, sponsors } from "./src/render/sections";
 
 /**
  * Fills {{TOKENS}} in index.html from the content files at build time, so the facts live in one
@@ -13,7 +13,7 @@ function contentTokens(): Plugin {
     name: "yess-content-tokens",
     buildStart() {
       // Launch checklist: say out loud which facts are still missing.
-      const todo = Object.entries({ REGISTER_URL: CONFIG.REGISTER_URL, NOTIFY_ENDPOINT: CONFIG.NOTIFY_ENDPOINT, CONTACT_EMAIL: CONFIG.CONTACT_EMAIL, SITE_URL: CONFIG.SITE_URL })
+      const todo = Object.entries({ REGISTER_URL: CONFIG.REGISTER_URL, SITE_URL: CONFIG.SITE_URL })
         .filter(([, v]) => !v).map(([k]) => k);
       if (!Object.values(CONFIG.SOCIALS).some(Boolean)) todo.push("SOCIALS");
       if (todo.length) this.warn(`CONFIG still empty (src/content/config.ts): ${todo.join(", ")}`);
@@ -56,7 +56,8 @@ function contentTokens(): Plugin {
           PROGRAMME: programme(),
           SPONSORS: sponsors(),
           FAQ: faq(),
-          NOTIFY: notify(),
+          QUESTIONS: questions(),
+          NOTIFY_DIALOG: notifyDialog(),
           SOCIALS: socials(),
           SITE_META: meta,
         };

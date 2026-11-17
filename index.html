@@ -55,7 +55,7 @@
 </header>
 <div class="menu" id="menu" hidden>
   <nav aria-label="Sections, full list">
-    <a href="#date">The date</a><a href="#about">About</a><a href="#highlights">Highlights</a><a href="#programme">Programme</a><a href="#venue">The host</a><a href="#partners">Collaborators</a><a href="#notify">Get notified</a>
+    <a href="#date">The date</a><a href="#about">About</a><a href="#highlights">Highlights</a><a href="#programme">Programme</a><a href="#venue">The host</a><a href="#partners">Collaborators</a><a href="#notify" data-notify-open aria-haspopup="dialog">Get notified</a>
   </nav>
 </div>
 
@@ -211,8 +211,8 @@
       <img class="logo foot__logo" src="./assets/YESS_Logo.svg" width="1202" height="463" alt="IEEE YESS, Yearly Engineering Students Summit 2026" loading="lazy" decoding="async">
       <div class="foot__ask">
         <h2 class="foot__q">Still have questions?</h2>
-        <p class="foot__sub">Leave your email. We will reply, and let you know when registration opens.</p>
-        {{NOTIFY}}
+        <p class="foot__sub">Leave your question. We'll reply by email.</p>
+        {{QUESTIONS}}
       </div>
       <div class="foot__cols">
         <nav aria-label="Sections, footer">
@@ -237,5 +237,6 @@
     </div>
   </div>
 </footer>
+{{NOTIFY_DIALOG}}
 </body>
 </html>

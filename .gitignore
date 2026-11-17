@@ -17,3 +17,7 @@ node_modules/
 
 # Build output
 dist/
+
+# Environment (real values live in .env.local and in Vercel)
+.env*
+!.env.example

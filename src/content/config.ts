@@ -36,15 +36,6 @@ export const CONFIG = {
 
   /** TODO: registration link. While null the primary action reads "Registration opens soon". */
   REGISTER_URL: null as string | null,
-  /** TODO: contact email. */
-  CONTACT_EMAIL: null as string | null,
-  /**
-   * TODO: endpoint the footer form ("Still have questions?") posts to: any form service that accepts
-   * POST with an "email" field (Formspree, Getform, Basin...). If it stays null but CONTACT_EMAIL is set,
-   * the form opens the visitor's mail app addressed to CONTACT_EMAIL instead. With neither, the footer
-   * shows a visible TODO.
-   */
-  NOTIFY_ENDPOINT: null as string | null,
   /** TODO: 2026 social handles (full URLs). Hidden while null. */
   SOCIALS: {
     instagram: null as string | null,

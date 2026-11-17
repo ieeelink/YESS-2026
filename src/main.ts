@@ -1,6 +1,7 @@
 import "./styles/base.css";
 import "./styles/hero.css";
 import "./styles/sections.css";
+import "./styles/forms.css";
 import "./styles/rework.css";
 import { runIntro } from "./intro";
 import { startCountdown } from "./lib/countdown";
@@ -9,6 +10,7 @@ import { initGallery } from "./sections/gallery";
 import { initHeroLight } from "./sections/hero";
 import { initNav } from "./sections/nav";
 import { initNotify } from "./sections/notify";
+import { initQuestions } from "./sections/questions";
 
 startCountdown(document.getElementById("count")!);
 
@@ -37,6 +39,7 @@ addEventListener("resize", () => { if (innerWidth === lastW) return; lastW = inn
 initNav();
 initGallery();
 initNotify();
+initQuestions();
 initHeroLight();
 runIntro(() => document.documentElement.classList.add("ready"));
 

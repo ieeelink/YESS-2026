@@ -6,6 +6,7 @@ import { CONFIG, directionsUrl } from "../content/config";
 import { HIGHLIGHTS } from "../content/highlights";
 import { FAQ, SPONSOR_TIERS } from "../content/placeholders";
 import { PROGRAMME } from "../content/programme";
+import { LIMITS, type FieldName } from "../lib/validate";
 
 export const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 const pad = (n: number) => String(n).padStart(2, "0");
@@ -18,12 +19,13 @@ export const primary = (label: string, icon: string = arrow) =>
 
 /**
  * The one primary action. "Register now" once CONFIG.REGISTER_URL is set; until then a short "Get notified"
- * that points at the footer form, with "Registration opens soon" as a small note beside it.
+ * that opens the sign-up dialog (src/sections/notify.ts), with "Registration opens soon" as a small note beside it.
+ * Without JS it still lands on the footer.
  */
 export const cta = () =>
   CONFIG.REGISTER_URL
     ? `<div class="cta"><a class="btn btn--primary" href="${esc(CONFIG.REGISTER_URL)}" target="_blank" rel="noopener">${primary("Register now", out)}<span class="sr-only"> (opens in a new tab)</span></a></div>`
-    : `<div class="cta"><p class="cta__note">Registration opens soon</p><a class="btn btn--primary" href="#notify">${primary("Get notified")}</a></div>`;
+    : `<div class="cta"><p class="cta__note">Registration opens soon</p><a class="btn btn--primary" href="#notify" data-notify-open aria-haspopup="dialog">${primary("Get notified")}</a></div>`;
 
 /**
  * The organizer marquee. One set of logos, repeated so each half of the track is wider than any
@@ -92,24 +94,77 @@ export function faq() {
   </details>`).join("\n");
 }
 
-/**
- * The footer form. Posts the email to CONFIG.NOTIFY_ENDPOINT; without one it falls back to a mail
- * link to CONFIG.CONTACT_EMAIL; with neither it shows a visible TODO (and the build warns).
- */
-export function notify() {
-  const mode = CONFIG.NOTIFY_ENDPOINT ? "post" : CONFIG.CONTACT_EMAIL ? "mail" : "off";
-  const attrs = mode === "post" ? ` action="${esc(CONFIG.NOTIFY_ENDPOINT!)}"` : mode === "mail" ? ` data-mail="${esc(CONFIG.CONTACT_EMAIL!)}"` : " data-off";
-  const todo = mode === "off"
-    ? `<p class="todo" role="note"><b>TODO</b> Connect this form: set <code>NOTIFY_ENDPOINT</code> or <code>CONTACT_EMAIL</code> in <code>src/content/config.ts</code>.</p>`
+/* ---- forms: the "Get notified" dialog and the footer question form. Behaviour: src/lib/form.ts. ---- */
+
+type FieldSpec = { id: string; name: FieldName; label: string; type?: "text" | "email"; autocomplete?: string; placeholder?: string; textarea?: boolean; autofocus?: boolean };
+
+/** One labelled control with its error line (`<id>-err`), plus a counter for the textarea and the typo hint for email. */
+function field(f: FieldSpec) {
+  const max = LIMITS[f.name];
+  const described = [`${f.id}-err`, f.textarea ? `${f.id}-count` : ""].filter(Boolean).join(" ");
+  const common = `id="${f.id}" name="${f.name}" maxlength="${max}" required aria-describedby="${described}"${f.placeholder ? ` placeholder="${esc(f.placeholder)}"` : ""}${f.autocomplete ? ` autocomplete="${f.autocomplete}"` : ""}${f.autofocus ? " autofocus" : ""}`;
+  const control = f.textarea
+    ? `<textarea class="field__input field__input--area" ${common} rows="5"></textarea>`
+    : `<input class="field__input" ${common} type="${f.type ?? "text"}"${f.type === "email" ? ` inputmode="email" autocapitalize="off" spellcheck="false"` : ""}>`;
+  const counter = f.textarea ? `<span class="field__count" id="${f.id}-count">0 / ${max}</span>` : "";
+  const hint = f.type === "email"
+    ? `<div aria-live="polite"><p class="field__hint" data-hint hidden>Did you mean <button class="field__fix" type="button" data-accept></button>? <button class="field__keep" type="button" data-keep>Keep what I typed</button></p></div>`
     : "";
-  return `<form class="notify" id="notifyForm" method="post"${attrs} novalidate>
-    <div class="notify__row">
-      <label class="sr-only" for="notifyEmail">Your email</label>
-      <input id="notifyEmail" name="email" type="email" required autocomplete="email" inputmode="email" placeholder="Enter your email">
-      <button class="btn btn--primary" type="submit">${primary("Send")}</button>
+  return `<div class="field">
+      <div class="field__head"><label class="field__label" for="${f.id}">${f.label}</label>${counter}</div>
+      ${control}
+      <p class="field__err" id="${f.id}-err"></p>${hint}
+    </div>`;
+}
+
+/** Bots fill every field; people never see this one. Its value is checked and never sent. */
+const honeypot = `<div class="hp" aria-hidden="true"><label>Website <input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>`;
+
+const actions = (label: string) => `<div class="form__actions">
+      <button class="btn btn--primary" type="submit">${primary(label)}</button>
+      <p class="form__status" role="status" aria-live="polite" data-status></p>
+    </div>`;
+
+/** The footer form: name, email, message → `questions`. */
+export function questions() {
+  return `<form class="form form--ask" id="askForm" novalidate>
+    ${honeypot}
+    <div class="form__pair">
+      ${field({ id: "askName", name: "name", label: "Name", autocomplete: "name" })}
+      ${field({ id: "askEmail", name: "email", label: "Email", type: "email", autocomplete: "email", placeholder: "name@example.com" })}
     </div>
-    <p class="notify__msg" id="notifyMsg" role="status" aria-live="polite"></p>
-  </form>${todo}`;
+    ${field({ id: "askMessage", name: "message", label: "Message", textarea: true, placeholder: "Ask us anything about the summit" })}
+    ${actions("Send")}
+  </form>`;
+}
+
+const close = `<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 3l10 10M13 3 3 13" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>`;
+
+/** The "Get notified" dialog: name, email, college → `notified`. Opened by [data-notify-open]. */
+export function notifyDialog() {
+  return `<dialog class="modal" id="notifyDialog" aria-modal="true" aria-labelledby="notifyTitle" aria-describedby="notifySub">
+  <div class="modal__panel"><div class="modal__in">
+    <button class="modal__close" type="button" data-close aria-label="Close">${close}</button>
+    <div data-view="form">
+      <p class="modal__eyebrow">Registration opens soon</p>
+      <h2 class="modal__title" id="notifyTitle">Get notified</h2>
+      <p class="modal__sub" id="notifySub">Leave your details and we will email you when registration for ${esc(CONFIG.EVENT_NAME)} opens.</p>
+      <form class="form" id="notifyForm" novalidate>
+        ${honeypot}
+        ${field({ id: "ntName", name: "name", label: "Full name", autocomplete: "name", autofocus: true })}
+        ${field({ id: "ntEmail", name: "email", label: "Email", type: "email", autocomplete: "email", placeholder: "name@example.com" })}
+        ${field({ id: "ntCollege", name: "college", label: "College", autocomplete: "organization" })}
+        ${actions("Notify me")}
+      </form>
+    </div>
+    <div class="modal__done" data-view="done" hidden>
+      <span class="modal__tick" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 22 22"><path d="M4 11.5 9 16.5 18 6" fill="none" stroke="currentColor" stroke-width="2"/></svg></span>
+      <h2 class="modal__title" id="notifyDoneTitle" tabindex="-1">You're on the list.</h2>
+      <p class="modal__sub">We will email you as soon as registration opens. See you on ${esc(CONFIG.DATE_DAY_MONTH).replace(" ", "&nbsp;")}.</p>
+      <div class="form__actions"><button class="btn btn--primary" type="button" data-close>${primary("Done")}</button></div>
+    </div>
+  </div></div>
+</dialog>`;
 }
 
 export function socials() {

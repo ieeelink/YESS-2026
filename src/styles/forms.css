@@ -1,0 +1,88 @@
+/* ---------- Forms (footer questions + the "Get notified" dialog) ----------
+   One field style, taken from the original footer input: square, 1px white/32% border, black/55% fill,
+   white border on focus, the green focus ring. Primary buttons are the shared chamfered .btn--primary. */
+:root { --err: #ff8a80; }
+
+.form { display: grid; gap: var(--s-4); }
+.form--ask { margin-top: clamp(20px, 3vh, 28px); }
+.form__pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: var(--s-4); }
+
+.field { display: grid; align-content: start; gap: 6px; min-width: 0; }
+.field__head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s-3); }
+.field__label { font-size: var(--fs-s); font-weight: 500; color: var(--ink-2); line-height: 1.4; }
+.field__count { font-size: var(--fs-xs); font-variant-numeric: tabular-nums; color: var(--ink-3); }
+.field__count[data-near="true"] { color: var(--ink); }
+
+.field__input { width: 100%; min-width: 0; height: var(--btn-h); padding: 0 18px; border: 1px solid rgb(255 255 255 / 0.32); border-radius: 0; background: rgb(0 0 0 / 0.55);
+  color: var(--ink); font: inherit; font-size: 16px; /* 16px: no zoom-on-focus on iOS */ transition: border-color var(--t-state) var(--ease); }
+.field__input--area { height: auto; min-height: 136px; padding-block: 14px; line-height: 1.5; resize: vertical; }
+.field__input::placeholder { color: var(--ink-3); opacity: 1; }
+.field__input:hover { border-color: rgb(255 255 255 / 0.6); }
+.field__input:focus { outline: none; border-color: var(--white); }
+.field__input:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; border-radius: 0; }
+.field__input[aria-invalid="true"] { border-color: var(--err); }
+.field__input:-webkit-autofill { -webkit-text-fill-color: var(--ink); box-shadow: 0 0 0 100px #050605 inset; caret-color: var(--ink); }
+
+.field__err { font-size: var(--fs-xs); line-height: 1.45; color: var(--err); }
+.field__err:empty { display: none; }
+
+.field__hint { font-size: var(--fs-xs); line-height: 1.5; color: var(--ink-2); }
+.field__fix, .field__keep { padding-block: 2px; background: linear-gradient(currentColor, currentColor) 0 100% / 100% 1px no-repeat; transition: color var(--t-state) var(--ease); }
+.field__fix { color: var(--green); font-weight: 600; word-break: break-all; }
+.field__fix:hover { color: var(--green-hi); }
+.field__keep { color: var(--ink-3); }
+.field__keep:hover { color: var(--ink); }
+
+.form__actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-3) var(--s-5); margin-top: var(--s-1); }
+.form__actions .btn--primary { flex: none; }
+.form__status { flex: 1 1 14em; min-height: 1.5em; font-size: var(--fs-s); line-height: 1.45; color: var(--ink-2); }
+.form__status:empty { display: none; }
+.form__status[data-kind="ok"] { color: var(--green); }
+.form__status[data-kind="error"] { color: var(--err); }
+
+/* disabled while sending and during the short resubmit cooldown */
+.btn--primary:disabled { cursor: not-allowed; }
+.btn--primary:disabled .btn__label, .btn--primary:disabled .btn__arrow { background: rgb(6 255 103 / 0.5); }
+.btn--primary:disabled .btn__icon { transform: none; }
+.btn--primary:disabled:active { transform: none; }
+.form[aria-busy="true"] .btn--primary:disabled { cursor: progress; }
+
+/* the honeypot: off-screen, never focusable */
+.hp { position: absolute; left: -10000px; top: auto; width: 1px; height: 1px; overflow: hidden; }
+
+/* ---------- The "Get notified" dialog: a near-black panel cut like the primary button ---------- */
+.modal { --cut: 22px; margin: auto; padding: 0; border: 0; background: transparent; color: var(--ink);
+  width: min(560px, calc(100% - 32px)); max-width: none; max-height: calc(100dvh - 32px); overflow: visible; }
+.modal::backdrop { background: rgb(0 0 0 / 0.72); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+.modal[open] { animation: modal-in var(--t-small) var(--ease); }
+.modal[open]::backdrop { animation: modal-fade var(--t-small) var(--ease); }
+@keyframes modal-in { from { opacity: 0; transform: translateY(14px); } }
+@keyframes modal-fade { from { opacity: 0; } }
+.modal-open { overflow: hidden; }
+
+/* a 1px border that follows the chamfers: the outer layer is the line, the inner layer the panel */
+.modal__panel { padding: 1px; background: var(--line-2);
+  clip-path: polygon(var(--cut) 0, 100% 0, 100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, 0 100%, 0 var(--cut)); }
+.modal__in { position: relative; max-height: calc(100dvh - 34px); overflow-y: auto; overscroll-behavior: contain;
+  padding: clamp(28px, 4vw, 44px) clamp(20px, 4vw, 44px) clamp(28px, 4vw, 40px); background: #0b0b0b;
+  clip-path: polygon(calc(var(--cut) - 0.4px) 0, 100% 0, 100% calc(100% - var(--cut) + 0.4px), calc(100% - var(--cut) + 0.4px) 100%, 0 100%, 0 calc(var(--cut) - 0.4px)); }
+.modal__close { position: absolute; top: 10px; right: 10px; display: grid; place-items: center; width: 44px; height: 44px; color: var(--ink-2); border-radius: var(--r);
+  transition: color var(--t-state) var(--ease), background-color var(--t-state) var(--ease); }
+.modal__close:hover { color: var(--ink); background: rgb(255 255 255 / 0.06); }
+.modal__eyebrow { font-size: var(--fs-xs); font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--green); }
+.modal__title { margin-top: var(--s-2); padding-right: 40px; font-family: var(--font-display); font-weight: 800; text-transform: uppercase;
+  font-size: clamp(40px, 6vw, 60px); line-height: 0.92; letter-spacing: -0.005em; }
+.modal__title:focus { outline: none; }
+.modal__sub { margin-top: var(--s-3); max-width: 30em; font-size: var(--fs-s); color: var(--ink-2); }
+.modal .form { margin-top: var(--s-6); }
+.modal__done { padding-top: var(--s-2); }
+.modal__done .form__actions { margin-top: var(--s-6); }
+.modal__tick { display: grid; place-items: center; width: 48px; height: 48px; margin-bottom: var(--s-4); color: var(--black); background: var(--green);
+  clip-path: polygon(10px 0, 100% 0, 100% 100%, 0 100%, 0 10px); }
+
+@media (max-width: 599px) {
+  .modal { --cut: 16px; width: calc(100% - 24px); max-height: calc(100dvh - 24px); }
+  .modal__in { max-height: calc(100dvh - 26px); }
+  .modal .form { margin-top: var(--s-5); }
+}
+@media (prefers-reduced-motion: reduce) { .modal[open], .modal[open]::backdrop { animation: none; } }
