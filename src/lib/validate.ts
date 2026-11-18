@@ -1,18 +1,13 @@
 /**
- * The one place both forms validate and normalise. The limits mirror firestore.rules exactly: if you
- * change a number here, change it there too (and the other way round).
+ * The one place both forms validate and normalise.
  */
-import type { FieldValue } from "firebase/firestore/lite";
-
 export const LIMITS = { name: 100, email: 254, college: 150, message: 2000 } as const;
 export const EMAIL_MIN = 5;
 export type FieldName = keyof typeof LIMITS;
 
-/** What lands in Firestore. No other fields, ever (the rules reject anything else). */
-export interface NotifiedDoc { name: string; email: string; college: string; createdAt: FieldValue }
-export interface QuestionDoc { name: string; email: string; message: string; createdAt: FieldValue }
+/** Sign-up data written by the separate "Get notified" form. */
+export interface NotifiedDoc { name: string; email: string; college: string; createdAt: import("firebase/firestore/lite").FieldValue }
 export type NotifiedInput = Omit<NotifiedDoc, "createdAt">;
-export type QuestionInput = Omit<QuestionDoc, "createdAt">;
 
 /**
  * Trim everything. Single-line fields also collapse runs of whitespace; the message keeps its line breaks.

@@ -84,7 +84,8 @@ if (hostJourney) {
     hostJourney.style.setProperty("--date-opacity", Math.max(0, Math.min(1, 1 - progress / .58)).toFixed(3));
     hostJourney.style.setProperty("--spiral-opacity", Math.max(0, Math.min(1, 1 - Math.max(0, progress - .56) / .3)).toFixed(3));
     const destination = hostJourney.querySelector<HTMLElement>(".host-destination");
-    if (destination) destination.style.pointerEvents = reducedMotion || progress > .9 ? "auto" : "none";
+    // Make the destination controls interactive as soon as the panel begins to appear.
+    if (destination) destination.style.pointerEvents = reducedMotion || progress > .55 ? "auto" : "none";
   };
   let journeyFrame = 0;
   const queueJourney = () => { if (!journeyFrame) journeyFrame = requestAnimationFrame(() => { journeyFrame = 0; updateJourney(); }); };

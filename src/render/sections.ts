@@ -125,7 +125,7 @@ const actions = (label: string) => `<div class="form__actions">
       <p class="form__status" role="status" aria-live="polite" data-status></p>
     </div>`;
 
-/** The footer form: name, email, message → `questions`. */
+/** The footer question form: name, email and message. */
 export function questions() {
   return `<form class="form form--ask" id="askForm" novalidate>
     ${honeypot}

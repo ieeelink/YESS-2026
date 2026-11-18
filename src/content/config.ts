@@ -69,6 +69,6 @@ export const CONFIG = {
   ],
 } as const;
 
-/** Directions are a Google Maps search for the venue name: no street address is confirmed. */
+/** Google Maps destination for the host campus. */
 export const directionsUrl = () =>
-  "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(`${CONFIG.VENUE_NAME}, ${CONFIG.VENUE_CITY}`);
+  "https://www.google.com/maps/place/Mar+Baselios+College+of+Engineering+and+Technology+(Autonomous)/@8.5490531,76.9385222,17z/data=!3m1!4b1!4m6!3m5!1s0x3b05b93fa775ed55:0x6f7096ccc9590ffc!8m2!3d8.5490531!4d76.9385222!16zL20vMGNkcjk4?entry=ttu&g_ep=EgoyMDI2MTExNS4wIKXMDSoASAFQAw%3D%3D";

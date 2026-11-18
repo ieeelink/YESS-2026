@@ -38,16 +38,6 @@ service cloud.firestore {
         && stampedNow();
     }
 
-    // "Still have questions?"
-    match /questions/{id} {
-      allow read, update, delete: if false;
-      allow create: if hasExactly(['name', 'email', 'message', 'createdAt'])
-        && isString(request.resource.data.name, 1, 100)
-        && validEmail(request.resource.data.email)
-        && isString(request.resource.data.message, 1, 2000)
-        && stampedNow();
-    }
-
     // Everything else, for everyone.
     match /{document=**} {
       allow read, write: if false;

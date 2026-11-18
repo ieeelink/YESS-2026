@@ -1,6 +1,6 @@
 import { bindForm } from "../lib/form";
 
-/** "Still have questions?": the footer form, written to the `questions` collection. */
+/** "Still have questions?": open a prefilled email in the visitor's configured mail app. */
 export function initQuestions() {
   const form = document.getElementById("askForm") as HTMLFormElement | null;
   if (!form) return;
@@ -8,11 +8,15 @@ export function initQuestions() {
     form,
     fields: ["name", "email", "message"],
     cooldownKey: "questions",
-    busyLabel: "Sending…",
-    successMessage: "Thank you, your message is in. We'll reply by email.",
+    busyLabel: "Opening…",
+    successMessage: "Your email app should open with your message ready to send.",
     send: async values => {
-      const { saveQuestion } = await import("../lib/db");
-      await saveQuestion(values);
+      const body = `Name: ${values.name}\n\nEmail: ${values.email}\n\nMessage:\n\n${values.message}`;
+      const params = new URLSearchParams({
+        subject: "IEEE YESS 2026 – New Inquiry",
+        body,
+      });
+      window.location.href = `mailto:ieeeyess2026@gmail.com?${params.toString()}`;
     },
   });
 }

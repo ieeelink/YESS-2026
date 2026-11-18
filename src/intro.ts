@@ -1,4 +1,8 @@
-/** Ease the YESS mark from the loading screen into the event hero. */
+import "./styles/book-loader.css";
+
+const MINIMUM_MS = 1200;
+const MAXIMUM_MS = 2600;
+
 export function runIntro(done: () => void) {
   const root = document.documentElement;
   const overlay = document.querySelector<HTMLElement>(".intro");
@@ -6,28 +10,43 @@ export function runIntro(done: () => void) {
 
   const label = document.getElementById("loadPercent");
   const bar = document.getElementById("loadProgress");
-  let start = 0, raf = 0, ended = false;
-  const duration = 2200;
+  let assetProgress = 0;
+  const assets: Promise<unknown>[] = [];
+  if (document.fonts?.ready) assets.push(document.fonts.ready.catch(() => undefined));
+  document.querySelectorAll<HTMLImageElement>("#heroLogo,.hero img").forEach(image => {
+    if (image.complete && image.naturalWidth) return;
+    assets.push(new Promise(resolve => {
+      image.addEventListener("load", resolve, { once:true });
+      image.addEventListener("error", resolve, { once:true });
+    }));
+  });
+  let assetsDone = assets.length === 0;
+  Promise.all(assets).then(() => { assetsDone = true; });
+
+  const start = performance.now();
+  let raf = 0, ended = false;
   const finish = () => {
     if (ended) return;
     ended = true;
     cancelAnimationFrame(raf);
-    if (label) label.textContent = "100%";
-    if (bar) bar.style.width = "100%";
     root.classList.add("loading-complete");
+    root.classList.remove("is-loading", "has-intro");
     done();
-    window.setTimeout(() => { root.classList.remove("has-intro", "loading-complete"); overlay.remove(); }, 900);
+    window.setTimeout(() => { root.classList.remove("loading-complete"); overlay.remove(); }, 700);
   };
-  const progress = (now: number) => {
+  const tick = (now: number) => {
     if (ended) return;
-    if (!start) start = now;
-    const p = Math.min(1, (now - start) / duration);
-    const eased = p * p * (3 - 2 * p);
-    const value = Math.min(100, Math.max(1, Math.floor(1 + eased * 99)));
-    if (label) label.textContent = `${String(value).padStart(2, "0")}%`;
+    const elapsed = now - start;
+    const timedProgress = Math.min(98, elapsed / MAXIMUM_MS * 100);
+    const value = Math.max(1, Math.floor(Math.max(timedProgress, assetProgress * 95)));
+    if (label) label.textContent = `${String(value).padStart(2,"0")}%`;
     if (bar) bar.style.width = `${value}%`;
-    if (p >= 1) { finish(); return; }
-    raf = requestAnimationFrame(progress);
+    if (elapsed >= MINIMUM_MS && assetsDone) {
+      if (label) label.textContent = "100%";
+      if (bar) bar.style.width = "100%";
+      finish(); return;
+    }
+    raf = requestAnimationFrame(tick);
   };
-  window.setTimeout(() => { if (overlay.isConnected) raf = requestAnimationFrame(progress); }, 140);
+  raf = requestAnimationFrame(tick);
 }

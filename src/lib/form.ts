@@ -55,9 +55,6 @@ export function bindForm<F extends FieldName>(o: FormOptions<F>) {
   const touched = new Set<F>();
   let busy = false;
 
-  // Firebase is only fetched once someone starts on a form.
-  form.addEventListener("focusin", () => { import("./db").catch(() => {}); }, { once: true });
-
   const say = (text: string, kind: "ok" | "error" | "" = "") => { status.textContent = text; status.dataset.kind = kind; };
   const setState = (s: State) => { form.dataset.state = s; };
 

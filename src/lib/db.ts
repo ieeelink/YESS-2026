@@ -1,10 +1,10 @@
 /**
- * The site's only two writes. Loaded lazily by the forms (`await import("./db")`), so Firebase is
+ * The site's sign-up write. Loaded lazily by the "Get notified" form, so Firebase is
  * fetched on first interaction with a form, not with the page.
  */
-import { addDoc, collection, doc, serverTimestamp, setDoc } from "firebase/firestore/lite";
+import { doc, serverTimestamp, setDoc } from "firebase/firestore/lite";
 import { db } from "./firebase";
-import type { NotifiedDoc, NotifiedInput, QuestionDoc, QuestionInput } from "./validate";
+import type { NotifiedDoc, NotifiedInput } from "./validate";
 
 const TIMEOUT_MS = 15000;
 const withTimeout = <T>(p: Promise<T>) =>
@@ -25,7 +25,3 @@ export async function saveNotified({ name, email, college }: NotifiedInput): Pro
   }
 }
 
-export async function saveQuestion({ name, email, message }: QuestionInput): Promise<void> {
-  const data: QuestionDoc = { name, email, message, createdAt: serverTimestamp() };
-  await withTimeout(addDoc(collection(db, "questions"), data));
-}
