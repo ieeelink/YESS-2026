@@ -10,18 +10,18 @@ import { initGallery } from "./sections/gallery";
 import { initHeroLight } from "./sections/hero";
 import { initNav } from "./sections/nav";
 import { initNotify } from "./sections/notify";
-import { initQuestions } from "./sections/questions";
+import { initFooter } from "./sections/footer";
 
 startCountdown(document.getElementById("count")!);
 
 // statements that reveal line by line: split now, again once fonts land, and when the measure changes
-// the footer wordmark: one line at about 70% of the content width, whatever the font metrics
+// fit the IEEE YESS wordmark to the footer's full inner width
 const mark = document.getElementById("footMark")!, markIn = mark.firstElementChild as HTMLElement;
 const fitMark = () => {
   mark.style.fontSize = "100px";
   const box = mark.parentElement!, cs = getComputedStyle(box);
   const content = box.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
-  mark.style.fontSize = `${((content * 0.7) / markIn.scrollWidth) * 100}px`;
+  mark.style.fontSize = `${(content * 0.85 / markIn.scrollWidth) * 100}px`;
 };
 
 const splits = [...document.querySelectorAll<HTMLElement>("[data-split]")];
@@ -39,7 +39,7 @@ addEventListener("resize", () => { if (innerWidth === lastW) return; lastW = inn
 initNav();
 initGallery();
 initNotify();
-initQuestions();
+initFooter();
 initHeroLight();
 runIntro(() => document.documentElement.classList.add("ready"));
 

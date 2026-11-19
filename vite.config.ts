@@ -1,6 +1,6 @@
 import { defineConfig, type Plugin } from "vite";
 import { CONFIG } from "./src/content/config";
-import { cta, directions, esc, faq, highlights, highlightsCount, marquee, notifyDialog, programme, questions, socials, sponsors } from "./src/render/sections";
+import { cta, directions, esc, faq, highlights, highlightsCount, marquee, notifyDialog, programme, socials, sponsors } from "./src/render/sections";
 
 /**
  * Fills {{TOKENS}} in index.html from the content files at build time, so the facts live in one
@@ -43,12 +43,13 @@ function contentTokens(): Plugin {
           ORGANIZED_BY: esc(CONFIG.ORGANIZED_BY),
           MARQUEE: marquee(),
           ABOUT: esc(CONFIG.ABOUT),
+          WHAT_LINE: esc(CONFIG.WHAT_LINE ?? ""),
           WHAT: CONFIG.WHAT_LINE ? `<p class="about__what lede fade">${esc(CONFIG.WHAT_LINE)}</p>` : "",
           LINK_IEEE: esc(CONFIG.LINKS.ieee),
           LINK_KERALA: esc(CONFIG.LINKS.ieeeKerala),
           LINK_LINK: esc(CONFIG.LINKS.ieeeLink),
           LINK_YESS25: esc(CONFIG.LINKS.yess25),
-          WORDMARK: [..."IEEE YESS"].map((c, i) => `<span class="ch" style="--i:${i}">${c === " " ? "&nbsp;" : c}</span>`).join(""),
+          WORDMARK: [..."IEEE YESS"].map((c, i) => `<span class="foot__mark-mask"><span class="ch" style="--i:${i}">${c === " " ? "&nbsp;" : c}</span></span>`).join(""),
           DIRECTIONS_URL: directions(),
           CTA: cta(),
           HIGHLIGHTS: highlights(),
@@ -56,7 +57,6 @@ function contentTokens(): Plugin {
           PROGRAMME: programme(),
           SPONSORS: sponsors(),
           FAQ: faq(),
-          QUESTIONS: questions(),
           NOTIFY_DIALOG: notifyDialog(),
           SOCIALS: socials(),
           SITE_META: meta,
