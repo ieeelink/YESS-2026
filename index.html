@@ -32,11 +32,10 @@
 <body>
 <a class="skip-link" href="#about">Skip to content</a>
 
-<div class="intro" aria-hidden="true">
-  <div class="loading-screen">
-    <div class="loading-screen__row"><span>LOADING</span><b id="loadPercent">01%</b></div>
-    <div class="loading-screen__scale"><i id="loadProgress"></i></div>
-    <div class="loading-screen__range"><span>01</span><span>100</span></div>
+<div class="intro">
+  <div class="loading-screen" role="progressbar" aria-label="Loading IEEE YESS 2026" aria-valuemin="1" aria-valuemax="100" aria-valuenow="1">
+    <div class="loading-screen__spinner" aria-hidden="true"><div class="loading-screen__core"></div></div>
+    <div class="loading-screen__percent"><span class="loading-screen__number" id="loadPercent">1</span><span class="loading-screen__sign">%</span></div>
   </div>
 </div>
 
