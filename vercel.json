@@ -24,9 +24,17 @@
       "source": "/strtini",
       "destination": "https://docs.google.com/forms/d/e/1FAIpQLSfgV5qSZhTNBzn7du6PKVU1CZe_QR2PomPfKVvUwrvTEUDuSA/viewform",
       "permanent": false
+    },
+    {
+      "source": "/Join-for-updates-WhatsApp",
+      "destination": "https://chat.whatsapp.com/FTEqcF0iCuc9sO7MKH3flI?s=cl&p=i&iam=2",
+      "permanent": false
     }
   ],
   "rewrites": [
-    { "source": "/:path*", "destination": "https://ieee-link.org/:path*" }
+    {
+      "source": "/:path*",
+      "destination": "https://ieee-link.org/:path*"
+    }
   ]
 }
