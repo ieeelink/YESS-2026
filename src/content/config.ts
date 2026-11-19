@@ -52,7 +52,7 @@ export const CONFIG = {
     ieeeKerala: "https://ieeekerala.org/",
     ieeeLink: "https://ieee-link.org/",
     /** Last year's site, linked from the earlier YESS build. If the 2026 site is deployed to this same domain, change it. */
-    yess25: "https://yess.ieee-link.org/",
+    yess25: "https://yess25.ieee-link.org",
   },
   /**
    * The organizer marquee in the hero. Real files from assets/partners, used exactly as supplied.
